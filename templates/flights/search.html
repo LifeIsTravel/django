@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header -->
+    <header class="mb-4">
+        <h1 class="text-center fw-bold text-primary">Life Is Travel</h1>
+        <p class="text-center text-muted">항공권 검색을 쉽게 하고 여행을 계획하세요!</p>
+    </header>
+
+    <!-- Search Form -->
+    <div class="card shadow-sm mx-auto" style="max-width: 600px;">
+        <div class="card-body">
+            <h5 class="card-title text-center mb-4">항공권 검색</h5>
+            <form method="GET" action="{% url 'flight_search' %}">
+                <!-- Trip Type Selector -->
+                <div class="mb-3">
+                    <label for="tripType" class="form-label fw-bold">여정 선택</label>
+                    <select id="tripType" name="tripType" class="form-select">
+                        <option value="편도" selected>편도</option>
+                        <option value="왕복">왕복</option>
+                    </select>
+                </div>
+
+                <!-- Departure & Arrival -->
+                <div class="row g-3 mb-3">
+                    <div class="col">
+                        <label for="departure" class="form-label fw-bold">출발지</label>
+                        <input type="text" id="departure" name="departure" class="form-control" placeholder="출발지">
+                    </div>
+                    <div class="col">
+                        <label for="destination" class="form-label fw-bold">도착지</label>
+                        <input type="text" id="destination" name="destination" class="form-control" placeholder="도착지">
+                    </div>
+                </div>
+
+                <!-- Date Selection -->
+                <div class="row g-3 mb-4">
+                    <div class="col">
+                        <label for="departureDate" class="form-label fw-bold">출발일</label>
+                        <input type="date" id="departureDate" name="departureDate" class="form-control">
+                    </div>
+                    <div class="col return-date" style="display: none;">
+                        <label for="returnDate" class="form-label fw-bold">복귀일</label>
+                        <input type="date" id="returnDate" name="returnDate" class="form-control">
+                    </div>
+                </div>
+
+                <!-- Search Button -->
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-lg">검색</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('tripType').addEventListener('change', function() {
+        const returnDateField = document.querySelector('.return-date');
+        if (this.value === '왕복') {
+            returnDateField.style.display = 'block';
+        } else {
+            returnDateField.style.display = 'none';
+        }
+    });
+</script>
+{% endblock %}

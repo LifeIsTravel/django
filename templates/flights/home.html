@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life Is Travel</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+        .header {
+            background-color: lightgray;
+            height: 16.66%; /* 1/6 of 100% */
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 50%; /* Remaining height after header */
+        }
+        .button {
+            margin: 40px;
+            padding: 10px 20px; /* 버튼 내부 여백 */
+        }
+        .footer-button {
+            position: fixed;
+            bottom: 40px; /* 아래쪽 여백 */
+            right: 40px; /* 오른쪽 여백 */
+            padding: 10px 20px; /* 버튼 내부 여백 */
+        }
+    </style>
+</head>
+<body>
+    <div class="header" style="display: flex; justify-content: center; align-items: center; position: relative;">
+        <a href="home.html" style="position: absolute; left: 3%; width: 50px; height: 50px; background-color: gray;"></a>
+        합리적으로 여행하자
+    </div>    
+    <div class="button-container">
+        <button class="button" onclick="location.href='page2.html'">항공권 정보를 보여줘</button>
+        <button class="button" onclick="location.href='page5.html'">여행은 가고 싶은데, 어떻게 할 지 모르겠어. 도와줘!</button>
+    </div>
+    <button class="footer-button" onclick="location.href='page4.html'">오늘 내 항공편 결항될까?</button>
+</body>
+</html>
