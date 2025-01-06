@@ -1,0 +1,58 @@
+name: Django CI/CD Dev Branch
+
+on:
+  push:
+    branches: [ dev ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Install AWS SSM Session Manager Plugin
+        run: |
+          curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb"
+          sudo dpkg -i session-manager-plugin.deb
+      
+      - name: Create production env file
+        run: |
+          echo "DJANGO_ENV=production
+          DB_NAME=${{ secrets.DB_NAME }}
+          DB_USER=${{ secrets.DB_USER }}
+          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          DB_HOST=${{ secrets.DB_HOST }}
+          DB_PORT=${{ secrets.DB_PORT }}
+          SECRET_KEY=${{ secrets.SECRET_KEY }}
+          DEBUG=False" > .env.prod
+
+      - name: Deploy via Systems Manager
+        run: |
+          # Package application
+          zip -r deployment.zip . -x "*.git*"
+          
+          # Upload to S3
+          aws s3 cp deployment.zip s3://team5-s3/deployment.zip
+          
+          # Run deployment command through SSM
+          aws ssm send-command \
+            --instance-ids "i-xxx" \
+            --document-name "AWS-RunShellScript" \
+            --parameters commands=[
+              "cd /path/to/app",
+              "aws s3 cp s3://team5-s3/deployment.zip .",
+              "unzip -o deployment.zip",
+              "source venv/bin/activate",
+              "pip install -r requirements.txt",
+              "mv .env.prod .env",
+              "python manage.py migrate",
+              "sudo systemctl restart gunicorn"
+            ]
+          

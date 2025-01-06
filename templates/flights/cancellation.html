@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Header Section -->
+    <div class="text-center mb-4">
+        <h1 class="text-primary">오늘 내 항공편 결항될까?</h1>
+        <p class="text-muted">항공편 정보를 입력하고 결항 가능성을 확인하세요!</p>
+    </div>
+
+    <!-- Form Section -->
+    <div id="form-container" class="card p-4 shadow-sm mx-auto" style="max-width: 500px;">
+        <form onsubmit="handleSubmit(event)">
+            <div class="mb-3">
+                <label for="departure-date" class="form-label">출발일자:</label>
+                <input type="date" id="departure-date" name="departure-date" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="flight-number" class="form-label">편명:</label>
+                <input type="text" id="flight-number" name="flight-number" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="departure-time" class="form-label">출발시간:</label>
+                <input type="time" id="departure-time" name="departure-time" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">결과 확인</button>
+        </form>
+    </div>
+
+    <!-- Result Section -->
+    <div id="result-container" class="d-none text-center mt-4">
+        <div class="alert alert-info" id="result-message">
+            <!-- 결항 확률 및 멘트가 여기에 출력됩니다 -->
+        </div>
+        <div class="card bg-light p-4 mt-3">
+            <h5 class="text-secondary">도착지의 날씨 정보</h5>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function handleSubmit(event) {
+        event.preventDefault();  // 폼 제출 기본 동작 방지
+        document.getElementById("form-container").classList.add("mb-4"); // 폼 아래 여백 추가
+        document.getElementById("result-container").classList.remove("d-none"); // 결과 보여주기
+
+        // 결항 확률을 무작위로 설정 (예: 0% ~ 100%)
+        const probability = Math.floor(Math.random() * 101);
+        const message = getMessage(probability);
+
+        document.getElementById("result-message").innerHTML = `오늘 항공편이 결항될 확률은 <strong>${probability}%</strong> 입니다.<br>${message}`;
+    }
+
+    function getMessage(probability) {
+        if (probability < 20) {
+            return "안전한 여행 되세요!";
+        } else if (probability < 50) {
+            return "잠시 긴장을 해주세요.";
+        } else {
+            return "결항될 가능성이 높습니다. 다른 준비를 고려하세요.";
+        }
+    }
+</script>
+{% endblock %}

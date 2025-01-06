@@ -12,7 +12,7 @@ def main():
     # Set the Django settings module based on DJANGO_ENV
     os.environ.setdefault(
         'DJANGO_SETTINGS_MODULE',
-        f'configuration.settings.{os.getenv("DJANGO_ENV", "local")}'
+        f'configuration.settings.{os.getenv("DJANGO_ENV", "production")}'
     )
     try:
         from django.core.management import execute_from_command_line
