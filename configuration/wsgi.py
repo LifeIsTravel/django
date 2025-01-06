@@ -15,7 +15,7 @@ load_dotenv()  # Load environment variables from .env file
 
 os.environ.setdefault(
     'DJANGO_SETTINGS_MODULE',
-    f'configuration.settings.{os.getenv("DJANGO_ENV", "local")}'
+    f'configuration.settings.{os.getenv("DJANGO_ENV", "production")}'
 )
 
 application = get_wsgi_application()
