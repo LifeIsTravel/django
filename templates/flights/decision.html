@@ -1,0 +1,231 @@
+<!-- templates/index.html -->
+{% extends 'base.html' %}
+
+{% block title %}Life Is Travel{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="header text-center py-3 position-relative" style="background-color: #f0f0f0;">
+        <!-- 이전 페이지 버튼을 왼쪽에 고정 -->
+        <a href="/flights" class="btn btn-secondary position-absolute"
+           style="left: 3%; top: 50%; transform: translateY(-50%);">메인 페이지</a>
+        <!-- 중앙 정렬된 제목과 설명 -->
+        <div class="d-flex flex-column align-items-center justify-content-center">
+            <a href="/flights" class="text-decoration-none">
+                <h1 class="fw-bold text-primary">Life Is Travel</h1>
+            </a>
+            <p class="text-center text-muted">여행은 가고 싶은데, 어떻게 할 지 모르겠어. 도와줘! - 여행지, 일정범위 정했을 때</p>
+        </div>
+    </div>
+
+    <!-- Form Section -->
+    <form id="travel-form" class="p-4 border rounded shadow-sm">
+        <div class="row g-3">
+            <!-- Left Column -->
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="budget" class="form-label d-inline" style="font-size: 1.25rem;">예산:</label>
+                    <input type="text" class="form-control d-inline w-auto" name="budget" id="budget">
+                    <span class="d-inline">원</span>
+                </div>
+
+                <div class="mb-3">
+                    <h5>지도</h5>
+                    <div class="map-box" id="map" style="width: 100%; height: 400px;"></div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="form-check" style="font-size: 1.25rem;">
+                        <input type="checkbox" class="form-check-input" id="undecided-destination-checkbox"
+                               name="undecided-map" value="true">
+                        <label class="form-check-label" for="undecided-destination-checkbox"
+                               style="font-size: 1.25rem;">아직 여행지를 안 정했어요</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="col-md-6">
+                <!-- 출발일 입력 -->
+                <div class="mb-3">
+                    <h6>출발일(시작)</h6>
+                    <input type="date" id="departure-date-start" class="form-control" name="departure-date-start"
+                           placeholder="출발일 시작">
+                    <h6>출발일(끝)</h6>
+                    <input type="date" id="departure-date-end" class="form-control" name="departure-date-end"
+                           placeholder="출발일 끝">
+                </div>
+                <br>
+                <!-- 도착일 입력 -->
+                <div class="mb-3">
+                    <h6>도착일(시작)</h6>
+                    <input type="date" id="arrival-date-start" class="form-control" name="arrival-date-start"
+                           placeholder="도착일 시작">
+                    <h6>도착일(끝)</h6>
+                    <input type="date" id="arrival-date-end" class="form-control" name="arrival-date-end"
+                           placeholder="도착일 끝">
+                </div>
+                <br>
+                <div class="mb-3">
+                    <div class="form-check" style="font-size: 1.25rem;">
+                        <input type="checkbox" class="form-check-input" id="undecided-schedule-checkbox"
+                               name="undecided-schedule" value="true">
+                        <label class="form-check-label" for="undecided-schedule-checkbox" style="font-size: 1.25rem;">아직
+                            일정을 안 정했어요</label>
+                    </div>
+
+                    <div class="toggle-box" id="toggle-box" style="display: none;">
+                        <label for="stay-duration" class="form-label">숙박 일수:</label>
+                        <select name="stay-duration" id="stay-duration" class="form-select">
+                            <option value="">선택</option>
+                            <option value="1">1박</option>
+                            <option value="2">2박</option>
+                            <option value="3">3박</option>
+                            <option value="4">4박</option>
+                            <option value="5">5박</option>
+                            <option value="6">6박</option>
+                            <option value="7">7박</option>
+                            <option value="8">8박</option>
+                            <option value="9">9박</option>
+                            <option value="10">10박</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary btn-lg">검색</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBnNhOJJoB4bLJXpYQuFOIClstU6yTbUDE"></script>
+<script>
+    // 기존의 자바스크립트 코드를 그대로 포함
+    let selectedCities = [];
+
+    function initMap() {
+        const japan = {lat: 38.2048, lng: 138.2529};
+        const map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 5,
+            center: japan,
+            streetViewControl: false,
+            mapTypeControl: false
+        });
+
+        const cities = [
+            {name: '후쿠오카', lat: 33.5902, lng: 130.4017},
+            {name: '삿포로', lat: 43.0618, lng: 141.3545},
+            {name: '도쿄', lat: 35.6895, lng: 139.6917},
+            {name: '오사카', lat: 34.6937, lng: 135.5023}
+        ];
+
+        let selectedMarkers = [];
+        let currentInfoWindow = null;
+
+        cities.forEach(city => {
+            const marker = new google.maps.Marker({
+                position: {lat: city.lat, lng: city.lng},
+                map: map,
+                title: city.name,
+                icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
+            });
+
+            const infoWindow = new google.maps.InfoWindow({
+                content: `<div style="background-color: white; text-align: center;">
+                            <strong>${city.name}</strong>
+                          </div>`,
+            });
+
+            marker.addListener('click', () => {
+                if (currentInfoWindow) {
+                    currentInfoWindow.close();
+                }
+                infoWindow.open(map, marker);
+                currentInfoWindow = infoWindow;
+
+                if (marker.getIcon() === 'http://maps.google.com/mapfiles/ms/icons/green-dot.png') {
+                    marker.setIcon('http://maps.google.com/mapfiles/ms/icons/red-dot.png');
+                    selectedCities.splice(cityIndex, 1);
+                } else {
+                    marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png');
+                    selectedCities.push(city.name);
+                }
+            });
+        });
+    }
+
+    $(document).ready(function () {
+        initMap();
+
+        $('#undecided-schedule-checkbox').on('change', function () {
+            const toggleBox = document.getElementById('toggle-box');
+            toggleBox.style.display = this.checked ? 'block' : 'none';
+        });
+
+        $('#travel-form').on('submit', function (event) {
+            event.preventDefault();
+            const destinationChecked = $('#undecided-destination-checkbox').is(':checked');
+            const scheduleChecked = $('#undecided-schedule-checkbox').is(':checked');
+
+            if (destinationChecked && scheduleChecked) {
+                alert("최대 하나만 선택할 수 있습니다. 하나의 체크박스만 선택해주세요.");
+                $('#undecided-destination-checkbox').prop('checked', false);
+                $('#undecided-schedule-checkbox').prop('checked', false);
+                $('#toggle-box').hide();
+                return;
+            }
+
+            const budget = $('input[name="budget"]').val();
+            if (!budget) {
+                alert("예산을 입력해주세요.");
+                return;
+            }
+
+            const departureDateStart = $('#departure-date-start').val();
+            const arrivalDateStart = $('#arrival-date-start').val();
+
+            if (!destinationChecked && !scheduleChecked) {
+                // 출발일과 도착일이 모두 선택되어 있는지 확인
+                if (selectedCities.length === 0 || !departureDateStart || !arrivalDateStart) {
+                    alert("도시, 출발일, 도착일을 모두 선택해주세요.");
+                    return;
+                }
+                const citiesParam = encodeURIComponent(selectedCities.join(','));
+                const url = `/flights/decision_all?cities=${citiesParam}&departure=${encodeURIComponent(departureDateStart)}&arrival=${encodeURIComponent(arrivalDateStart)}&budget=${encodeURIComponent(budget)}`;
+                window.location.href = url;
+            } else if (destinationChecked) {
+                // 일정이 정해지지 않은 경우
+                if (!departureDateStart || !arrivalDateStart) {
+                    alert("출발일 혹은 도착일을 선택해주세요.");
+                    return;
+                }
+                const url = `/flights/decision_date?departure=${encodeURIComponent(departureDateStart)}&arrival=${encodeURIComponent(arrivalDateStart)}&budget=${encodeURIComponent(budget)}`;
+                window.location.href = url;
+            } else if (scheduleChecked) {
+                // 일정이 정해진 경우
+                if (selectedCities.length === 0) {
+                    alert("도시를 선택해주세요.");
+                    return;
+                }
+                const stayDuration = $('#stay-duration').val();
+                if (!stayDuration) {
+                    alert("숙박 일수를 선택해주세요.");
+                    return;
+                }
+                const citiesParam = encodeURIComponent(selectedCities.join(','));
+                const url = `/flights/decision_city?cities=${citiesParam}&stay-duration=${stayDuration}&budget=${encodeURIComponent(budget)}`;
+                window.location.href = url;
+            }
+        });
+
+    });
+
+
+</script>
+{% endblock %}

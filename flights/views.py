@@ -13,3 +13,15 @@ def flight_details(request):
 
 def flight_cancellation(request):
     return render(request, 'flights/cancellation.html')
+
+def flight_decision(request):
+    return render(request, 'flights/decision.html')
+
+def flight_decision_all(request):
+    return render(request, 'flights/decision_all.html')
+
+def flight_decision_city(request):
+    return render(request, 'flights/decision_city.html')
+
+def flight_decision_date(request):
+    return render(request, 'flights/decision_date.html')
