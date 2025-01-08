@@ -1,13 +1,11 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load humanize %}
 
 {% block content %}
-<!-- Header -->
 <div class="header text-center py-3 position-relative" style="background-color: #f0f0f0;">
-    <!-- 이전 페이지 버튼을 왼쪽에 고정 -->
     <a href="/flights" class="btn btn-secondary position-absolute"
        style="left: 3%; top: 50%; transform: translateY(-50%);">메인 페이지</a>
-    <!-- 중앙 정렬된 제목과 설명 -->
     <div class="d-flex flex-column align-items-center justify-content-center">
         <a href="/flights" class="text-decoration-none">
             <h1 class="fw-bold text-primary">Life Is Travel</h1>
@@ -15,44 +13,52 @@
         <p class="text-center text-muted">항공권 정보를 확인하세요!</p>
     </div>
 </div>
-<div class="container mt-5">
-    <!-- Header Section -->
-<!--?    <div class="text-center mb-4">-->
-<!--?        <h1 class="text-primary">항공권 정보를 확인하세요!</h1>-->
-<!--?        <p class="text-muted">입력하신 정보를 기반으로 항공권 세부 정보를 표시합니다.</p>-->
-<!--?    </div>-->
 
-    <!-- Content Section -->
-    <div class="card shadow-sm mx-auto" style="max-width: 600px;">
-        <div class="card-body" id="travel-info">
-            <!-- URL 파라미터 값들이 이곳에 표시됩니다. -->
+<div class="container mt-5">
+    <div class="text-center mb-4">
+        <h1 class="text-primary">항공권 리스트</h1>
+        <p class="text-muted">정렬 옵션을 선택하세요:</p>
+        <div class="btn-group">
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort=price"
+               class="btn btn-outline-primary {% if sort_by == 'price' %}active{% endif %}">
+                가격순
+            </a>
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort=airline"
+               class="btn btn-outline-primary {% if sort_by == 'airline' %}active{% endif %}">
+                항공사 이름순
+            </a>
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    // URL에서 파라미터를 추출하는 함수
-    function getUrlParams() {
-        const params = new URLSearchParams(window.location.search);
-        return {
-            departure: params.get('departure') || '정보 없음',  // 출발지
-            destination: params.get('destination') || '정보 없음', // 도착지
-            departureDate: params.get('departureDate') || '정보 없음', // 출발일
-            returnDate: params.get('returnDate') || null         // 귀국일(왕복인 경우)
-        };
-    }
-
-    // 파라미터를 가져와 표시
-    const params = getUrlParams();
-    const travelInfoDiv = document.getElementById("travel-info");
-
-    travelInfoDiv.innerHTML += `<div class="mb-3"><strong>출발지:</strong> ${params.departure}</div>`;
-    travelInfoDiv.innerHTML += `<div class="mb-3"><strong>도착지:</strong> ${params.destination}</div>`;
-    travelInfoDiv.innerHTML += `<div class="mb-3"><strong>출발일:</strong> ${params.departureDate}</div>`;
-    if (params.returnDate) {
-        travelInfoDiv.innerHTML += `<div class="mb-3"><strong>귀국일:</strong> ${params.returnDate}</div>`;
-    }
-</script>
+    {% if flights %}
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead class="table-primary text-center">
+                <tr>
+                    <th>항공사</th>
+                    <th>출발지</th>
+                    <th>도착지</th>
+                    <th>출발일</th>
+                    <th>귀국일</th>
+                    <th>가격</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for flight in flights %}
+                <tr class="text-center">
+                    <td>{{ flight.airline }}</td>
+                    <td>{{ flight.departure }}</td>
+                    <td>{{ flight.destination }}</td>
+                    <td>{{ flight.departure_date }}</td>
+                    <td>{{ flight.return_date|default:"-" }}</td>
+                    <td>₩{{ flight.price|intcomma }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-center text-muted">검색 조건에 맞는 항공권이 없습니다.</p>
+    {% endif %}
+</div>
 {% endblock %}
