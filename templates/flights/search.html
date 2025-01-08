@@ -70,12 +70,14 @@
 {% block extra_js %}
 <script>
     document.getElementById('tripType').addEventListener('change', function() {
-        const returnDateField = document.querySelector('.return-date');
-        if (this.value === '왕복') {
-            returnDateField.style.display = 'block';
-        } else {
-            returnDateField.style.display = 'none';
-        }
+    const returnDateField = document.querySelector('.return-date');
+    const returnDateInput = document.getElementById('returnDate');
+    if (this.value === '왕복') {
+        returnDateField.style.display = 'block';
+    } else {
+        returnDateField.style.display = 'none';
+        returnDateInput.value = ''; // 편도 선택 시 복귀일 초기화
+    }
     });
 
     function searchFlight() {
@@ -104,8 +106,8 @@
             return;
         }
 
-        // 페이지 이동
-        const url = `/flights/details?departure=${encodeURIComponent(departure)}&destination=${encodeURIComponent(destination)}&departureDate=${encodeURIComponent(departureDate)}&returnDate=${encodeURIComponent(returnDate)}`;
+         // 페이지 이동 (기본적으로 가격순 정렬)
+        const url = `/flights/details?departure=${encodeURIComponent(departure)}&destination=${encodeURIComponent(destination)}&departureDate=${encodeURIComponent(departureDate)}&returnDate=${encodeURIComponent(returnDate)}&sort=price`;
         window.location.href = url;
     }
 </script>
