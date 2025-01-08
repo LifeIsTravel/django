@@ -44,7 +44,7 @@ def flight_details(request):
             )
 
     # 정렬 적용
-    #flights = flights.order_by(order)
+    flights = flights.order_by(order)
 
     return render(request, 'flights/details.html', {'flights': flights, 'sort_by': sort_by})
 

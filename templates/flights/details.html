@@ -31,34 +31,50 @@
     </div>
 </div>
     {% if flights %}
-    <div class="table-responsive">
-        <table class="table table-bordered table-hover">
-            <thead class="table-primary text-center">
-                <tr>
-                    <th>항공사</th>
-                    <th>출발지</th>
-                    <th>도착지</th>
-                    <th>출발일</th>
-                    <th>귀국일</th>
-                    <th>가격</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for flight in flights %}
-                <tr class="text-center">
-                    <td>{{ flight.airline }}</td>
-                    <td>{{ flight.departure }}</td>
-                    <td>{{ flight.destination }}</td>
-                    <td>{{ flight.departure_date }}</td>
-                    <td>{{ flight.return_date|default:"-" }}</td>
-                    <td>₩{{ flight.price|intcomma }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-primary text-center">
+                    <tr>
+                        <th>항공사</th>
+                        <th>출발지</th>
+                        <th>도착지</th>
+                        <th>출발일</th>
+                        <th>출발 시간</th>
+                        {% if flights.0.return_date and flights.0.return_time %}
+                            <th>귀국일</th>
+                            <th>귀국 시간</th>
+                        {% endif %}
+                        <th>가격</th>
+                        <th>바우처</th>
+                        <th>예약 링크</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for flight in flights %}
+                    <tr class="text-center">
+                        <td>{{ flight.airline }}</td>
+                        <td>{{ flight.departure }}</td>
+                        <td>{{ flight.destination }}</td>
+                        <td>{{ flight.departure_date }}</td>
+                        <td>{{ flight.departure_time }}</td>
+                        {% if flight.return_date and flight.return_time %}
+                            <td>{{ flight.return_date }}</td>
+                            <td>{{ flight.return_time }}</td>
+                        {% endif %}
+                        <td>₩{{ flight.price|intcomma }}</td>
+                        <td>{{ flight.agent_name }}</td>
+                        <td>
+                            <a href="{{ flight.url }}" target="_blank" class="btn btn-sm btn-primary">
+                                예약하기
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     {% else %}
-    <p class="text-center text-muted">검색 조건에 맞는 항공권이 없습니다.</p>
+        <p class="text-center text-muted">검색 결과가 없습니다.</p>
     {% endif %}
 </div>
 {% endblock %}
