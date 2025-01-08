@@ -4,98 +4,146 @@
 {% block title %}Life Is Travel{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <!-- Header -->
-    <div class="header text-center py-3 position-relative" style="background-color: #f0f0f0;">
-        <!-- 이전 페이지 버튼을 왼쪽에 고정 -->
+<div class="container my-4">
+    <!-- 페이지 헤더 -->
+    <div class="text-center mb-4 position-relative" style="background-color: #f0f0f0;">
+        <!-- 메인 페이지 버튼 -->
         <a href="/flights" class="btn btn-secondary position-absolute"
-           style="left: 3%; top: 50%; transform: translateY(-50%);">메인 페이지</a>
-        <!-- 중앙 정렬된 제목과 설명 -->
-        <div class="d-flex flex-column align-items-center justify-content-center">
+           style="left: 2%; top: 50%; transform: translateY(-50%);">
+           메인 페이지
+        </a>
+        <div class="py-3">
             <a href="/flights" class="text-decoration-none">
                 <h1 class="fw-bold text-primary">Life Is Travel</h1>
             </a>
-            <p class="text-center text-muted">여행은 가고 싶은데, 어떻게 할 지 모르겠어. 도와줘! - 여행지, 일정범위 정했을 때</p>
+            <p class="text-muted">여행은 가고 싶은데, 어떻게 할 지 모르겠어. 도와줘!</p>
         </div>
     </div>
 
-    <!-- Form Section -->
-    <form id="travel-form" class="p-4 border rounded shadow-sm">
-        <div class="row g-3">
-            <!-- Left Column -->
+    <!-- 폼 시작 -->
+    <form id="travel-form">
+        <div class="row g-4">
+            <!-- 일정 / 예산 (왼쪽) -->
             <div class="col-md-6">
-                <div class="mb-3">
-                    <label for="budget" class="form-label d-inline" style="font-size: 1.25rem;">예산:</label>
-                    <input type="text" class="form-control d-inline w-auto" name="budget" id="budget">
-                    <span class="d-inline">원</span>
+                <!-- 일정 선택 카드 -->
+                <div class="card mb-3">
+                    <div class="card-header text-white bg-primary">
+                        일정 선택
+                    </div>
+                    <div class="card-body">
+                        <!-- 라디오 버튼: 날짜 범위 / 숙박 일수 -->
+                        <div class="mb-3">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio"
+                                       name="scheduleType" id="radio-date-range"
+                                       value="dateRange" checked>
+                                <label class="form-check-label" for="radio-date-range">
+                                    날짜 범위
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio"
+                                       name="scheduleType" id="radio-stay-duration"
+                                       value="stayDuration">
+                                <label class="form-check-label" for="radio-stay-duration">
+                                    숙박 일수
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- 날짜 범위 섹션 -->
+                        <div id="date-range-section">
+                            <div class="mb-3">
+                                <label for="departure-date-range" class="form-label">
+                                    출발일 범위
+                                </label>
+                                <input type="text" id="departure-date-range"
+                                       class="form-control"
+                                       placeholder="출발일 범위 선택">
+                                <!-- 출발일 hidden inputs -->
+                                <input type="hidden" id="departure-date-start" name="departure-date-start">
+                                <input type="hidden" id="departure-date-end" name="departure-date-end">
+                            </div>
+                            <div class="mb-3">
+                                <label for="arrival-date-range" class="form-label">
+                                    도착일 범위
+                                </label>
+                                <input type="text" id="arrival-date-range"
+                                       class="form-control"
+                                       placeholder="도착일 범위 선택">
+                                <!-- 도착일 hidden inputs -->
+                                <input type="hidden" id="arrival-date-start" name="arrival-date-start">
+                                <input type="hidden" id="arrival-date-end" name="arrival-date-end">
+                            </div>
+                        </div>
+
+                        <!-- 숙박 일수 섹션 -->
+                        <div id="stay-duration-section" style="display: none;">
+                            <div class="mb-3">
+                                <label for="stay-duration" class="form-label">
+                                    숙박 일수:
+                                </label>
+                                <select name="stay-duration" id="stay-duration" class="form-select">
+                                    <option value="">선택</option>
+                                    <option value="1">1박</option>
+                                    <option value="2">2박</option>
+                                    <option value="3">3박</option>
+                                    <option value="4">4박</option>
+                                    <option value="5">5박</option>
+                                    <option value="6">6박</option>
+                                    <option value="7">7박</option>
+                                    <option value="8">8박</option>
+                                    <option value="9">9박</option>
+                                    <option value="10">10박</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="mb-3">
-                    <h5>지도</h5>
-                    <div class="map-box" id="map" style="width: 100%; height: 400px;"></div>
-                </div>
-
-                <div class="mb-3">
-                    <div class="form-check" style="font-size: 1.25rem;">
-                        <input type="checkbox" class="form-check-input" id="undecided-destination-checkbox"
-                               name="undecided-map" value="true">
-                        <label class="form-check-label" for="undecided-destination-checkbox"
-                               style="font-size: 1.25rem;">아직 여행지를 안 정했어요</label>
+                <!-- 예산 카드 -->
+                <div class="card mb-3">
+                    <div class="card-header text-white bg-secondary">
+                        예산
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="budget" class="form-label">
+                                예산 (원)
+                            </label>
+                            <input type="text" class="form-control w-auto"
+                                   name="budget" id="budget" placeholder="예: 500000">
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Column -->
+            <!-- 지도 / 여행지 결정 (오른쪽) -->
             <div class="col-md-6">
-                <!-- 출발일 입력 -->
-                <div class="mb-3">
-                    <h6>출발일(시작)</h6>
-                    <input type="date" id="departure-date-start" class="form-control" name="departure-date-start"
-                           placeholder="출발일 시작">
-                    <h6>출발일(끝)</h6>
-                    <input type="date" id="departure-date-end" class="form-control" name="departure-date-end"
-                           placeholder="출발일 끝">
-                </div>
-                <br>
-                <!-- 도착일 입력 -->
-                <div class="mb-3">
-                    <h6>도착일(시작)</h6>
-                    <input type="date" id="arrival-date-start" class="form-control" name="arrival-date-start"
-                           placeholder="도착일 시작">
-                    <h6>도착일(끝)</h6>
-                    <input type="date" id="arrival-date-end" class="form-control" name="arrival-date-end"
-                           placeholder="도착일 끝">
-                </div>
-                <br>
-                <div class="mb-3">
-                    <div class="form-check" style="font-size: 1.25rem;">
-                        <input type="checkbox" class="form-check-input" id="undecided-schedule-checkbox"
-                               name="undecided-schedule" value="true">
-                        <label class="form-check-label" for="undecided-schedule-checkbox" style="font-size: 1.25rem;">아직
-                            일정을 안 정했어요</label>
+                <div class="card">
+                    <div class="card-header text-white bg-info">
+                        여행지 선택
                     </div>
-
-                    <div class="toggle-box" id="toggle-box" style="display: none;">
-                        <label for="stay-duration" class="form-label">숙박 일수:</label>
-                        <select name="stay-duration" id="stay-duration" class="form-select">
-                            <option value="">선택</option>
-                            <option value="1">1박</option>
-                            <option value="2">2박</option>
-                            <option value="3">3박</option>
-                            <option value="4">4박</option>
-                            <option value="5">5박</option>
-                            <option value="6">6박</option>
-                            <option value="7">7박</option>
-                            <option value="8">8박</option>
-                            <option value="9">9박</option>
-                            <option value="10">10박</option>
-                        </select>
+                    <div class="card-body">
+                        <!-- 아직 여행지를 안 정했어요 체크박스 -->
+                        <div class="form-check mb-3">
+                            <input type="checkbox" class="form-check-input"
+                                   id="undecided-destination-checkbox"
+                                   name="undecided-map" value="true">
+                            <label class="form-check-label"
+                                   for="undecided-destination-checkbox">
+                                아직 여행지를 안 정했어요
+                            </label>
+                        </div>
+                        <!-- 지도 -->
+                        <div id="map" style="width: 100%; height: 400px;"></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="text-center">
+        <!-- 검색 버튼 -->
+        <div class="text-center mt-4">
             <button type="submit" class="btn btn-primary btn-lg">검색</button>
         </div>
     </form>
@@ -103,129 +151,216 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBnNhOJJoB4bLJXpYQuFOIClstU6yTbUDE"></script>
-<script>
-    // 기존의 자바스크립트 코드를 그대로 포함
-    let selectedCities = [];
+<!-- jQuery -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
 
+<!-- Flatpickr -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+
+<!-- 구글 맵 -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBnNhOJJoB4bLJXpYQuFOIClstU6yTbUDE"></script>
+
+<script>
+    let selectedCities = [];
+    let map, currentInfoWindow = null;
+    const cities = [
+        {name: '후쿠오카', lat: 33.5902, lng: 130.4017},
+        {name: '삿포로',   lat: 43.0618, lng: 141.3545},
+        {name: '도쿄',     lat: 35.6895, lng: 139.6917},
+        {name: '오사카',   lat: 34.6937, lng: 135.5023}
+    ];
+    let markers = [];
+
+    // 지도 초기화
     function initMap() {
-        const japan = {lat: 38.2048, lng: 138.2529};
-        const map = new google.maps.Map(document.getElementById('map'), {
+        const centerLocation = {lat: 38.2048, lng: 138.2529}; // 일본 중심(예시)
+        map = new google.maps.Map(document.getElementById('map'), {
             zoom: 5,
-            center: japan,
+            center: centerLocation,
             streetViewControl: false,
             mapTypeControl: false
         });
 
-        const cities = [
-            {name: '후쿠오카', lat: 33.5902, lng: 130.4017},
-            {name: '삿포로', lat: 43.0618, lng: 141.3545},
-            {name: '도쿄', lat: 35.6895, lng: 139.6917},
-            {name: '오사카', lat: 34.6937, lng: 135.5023}
-        ];
-
-        let selectedMarkers = [];
-        let currentInfoWindow = null;
-
+        // 도시 마커 생성
         cities.forEach(city => {
             const marker = new google.maps.Marker({
                 position: {lat: city.lat, lng: city.lng},
                 map: map,
                 title: city.name,
-                icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
+                icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
             });
 
+            // InfoWindow
             const infoWindow = new google.maps.InfoWindow({
-                content: `<div style="background-color: white; text-align: center;">
-                            <strong>${city.name}</strong>
-                          </div>`,
+                content: `<div style="text-align: center;"><strong>${city.name}</strong></div>`,
             });
 
+            // 마커 클릭 이벤트
             marker.addListener('click', () => {
-                if (currentInfoWindow) {
-                    currentInfoWindow.close();
+                // "아직 여행지를 안 정했어요" 체크되어 있으면 무시
+                if ($('#undecided-destination-checkbox').is(':checked')) {
+                    return;
                 }
+                // InfoWindow 관리
+                if (currentInfoWindow) currentInfoWindow.close();
                 infoWindow.open(map, marker);
                 currentInfoWindow = infoWindow;
 
+                // 아이콘 변경 & 배열 업데이트
                 if (marker.getIcon() === 'http://maps.google.com/mapfiles/ms/icons/green-dot.png') {
+                    // 이미 선택된 상태 -> 해제
                     marker.setIcon('http://maps.google.com/mapfiles/ms/icons/red-dot.png');
-                    selectedCities.splice(cityIndex, 1);
+                    selectedCities = selectedCities.filter(name => name !== city.name);
                 } else {
+                    // 선택
                     marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png');
                     selectedCities.push(city.name);
                 }
             });
+
+            markers.push(marker);
         });
     }
 
-    $(document).ready(function () {
+    // "아직 여행지를 안 정했어요" 체크 박스
+    function handleDestinationCheckbox() {
+        if ($('#undecided-destination-checkbox').is(':checked')) {
+            // 도시 선택 초기화
+            selectedCities = [];
+            // 모든 마커를 빨간색으로 변경
+            markers.forEach(marker => {
+                marker.setIcon('http://maps.google.com/mapfiles/ms/icons/red-dot.png');
+            });
+        }
+    }
+
+    // 일정 선택: dateRange / stayDuration 에 따른 화면 토글
+    function toggleScheduleSection(value) {
+        if (value === 'dateRange') {
+            $('#date-range-section').show();
+            $('#stay-duration-section').hide();
+        } else {
+            $('#date-range-section').hide();
+            $('#stay-duration-section').show();
+        }
+    }
+
+    $(document).ready(function() {
         initMap();
 
-        $('#undecided-schedule-checkbox').on('change', function () {
-            const toggleBox = document.getElementById('toggle-box');
-            toggleBox.style.display = this.checked ? 'block' : 'none';
+        // "아직 여행지를 안 정했어요" 체크 시 도시 선택 초기화
+        $('#undecided-destination-checkbox').on('change', function() {
+            handleDestinationCheckbox();
         });
 
-        $('#travel-form').on('submit', function (event) {
-            event.preventDefault();
-            const destinationChecked = $('#undecided-destination-checkbox').is(':checked');
-            const scheduleChecked = $('#undecided-schedule-checkbox').is(':checked');
+        // 일정 선택 라디오 버튼 변경 시
+        $('input[name="scheduleType"]').on('change', function() {
+            toggleScheduleSection($(this).val());
+        });
 
-            if (destinationChecked && scheduleChecked) {
-                alert("최대 하나만 선택할 수 있습니다. 하나의 체크박스만 선택해주세요.");
-                $('#undecided-destination-checkbox').prop('checked', false);
-                $('#undecided-schedule-checkbox').prop('checked', false);
-                $('#toggle-box').hide();
-                return;
+        // Flatpickr 설정 (출발일 범위)
+        flatpickr('#departure-date-range', {
+            mode: 'range',
+            dateFormat: 'Y-m-d',
+            locale: 'ko',
+            onClose: function(selectedDates) {
+                if (selectedDates.length === 2) {
+                    const start = selectedDates[0];
+                    const end = selectedDates[1];
+                    $('#departure-date-start').val(start.toISOString().split("T")[0]);
+                    $('#departure-date-end').val(end.toISOString().split("T")[0]);
+                } else {
+                    $('#departure-date-start').val('');
+                    $('#departure-date-end').val('');
+                }
             }
+        });
 
-            const budget = $('input[name="budget"]').val();
+        // Flatpickr 설정 (도착일 범위)
+        flatpickr('#arrival-date-range', {
+            mode: 'range',
+            dateFormat: 'Y-m-d',
+            locale: 'ko',
+            onClose: function(selectedDates) {
+                if (selectedDates.length === 2) {
+                    const start = selectedDates[0];
+                    const end = selectedDates[1];
+                    $('#arrival-date-start').val(start.toISOString().split("T")[0]);
+                    $('#arrival-date-end').val(end.toISOString().split("T")[0]);
+                } else {
+                    $('#arrival-date-start').val('');
+                    $('#arrival-date-end').val('');
+                }
+            }
+        });
+
+        // 폼 제출
+        $('#travel-form').on('submit', function(event) {
+            event.preventDefault();
+
+            const budget = $('#budget').val().trim();
             if (!budget) {
                 alert("예산을 입력해주세요.");
                 return;
             }
 
-            const departureDateStart = $('#departure-date-start').val();
-            const arrivalDateStart = $('#arrival-date-start').val();
+            const destinationChecked = $('#undecided-destination-checkbox').is(':checked');
+            const scheduleType = $('input[name="scheduleType"]:checked').val();
 
-            if (!destinationChecked && !scheduleChecked) {
-                // 출발일과 도착일이 모두 선택되어 있는지 확인
-                if (selectedCities.length === 0 || !departureDateStart || !arrivalDateStart) {
-                    alert("도시, 출발일, 도착일을 모두 선택해주세요.");
+            // 일정이 날짜 범위인지 숙박 일수인지 분기
+            if (scheduleType === 'dateRange') {
+                // 날짜 범위
+                const departureStart = $('#departure-date-start').val();
+                const departureEnd = $('#departure-date-end').val(); // 필요하다면 사용
+                const arrivalStart = $('#arrival-date-start').val();
+                const arrivalEnd = $('#arrival-date-end').val();   // 필요하다면 사용
+
+                if (!departureStart || !arrivalStart) {
+                    alert("출발일 범위, 도착일 범위를 정확히 선택해주세요.");
                     return;
                 }
-                const citiesParam = encodeURIComponent(selectedCities.join(','));
-                const url = `/flights/decision_all?cities=${citiesParam}&departure=${encodeURIComponent(departureDateStart)}&arrival=${encodeURIComponent(arrivalDateStart)}&budget=${encodeURIComponent(budget)}`;
-                window.location.href = url;
-            } else if (destinationChecked) {
-                // 일정이 정해지지 않은 경우
-                if (!departureDateStart || !arrivalDateStart) {
-                    alert("출발일 혹은 도착일을 선택해주세요.");
-                    return;
+
+                if (destinationChecked) {
+                    // 여행지를 안 정했음 => /flights/decision_date
+                    const url = `/flights/decision_date?departureStart=${encodeURIComponent(departureStart)}&departureEnd=${encodeURIComponent(departureEnd)}&arrivalStart=${encodeURIComponent(arrivalStart)}&arrivalEnd=${encodeURIComponent(arrivalEnd)}&budget=${encodeURIComponent(budget)}`;
+                    window.location.href = url;
+                } else {
+                    // 지도에서 도시 선택 => /flights/decision_all
+                    if (selectedCities.length === 0) {
+                        alert("여행지를 최소 1개 선택하거나 '아직 여행지를 안 정했어요'를 체크하세요.");
+                        return;
+                    }
+                    const citiesParam = encodeURIComponent(selectedCities.join(','));
+                    const url = `/flights/decision_all?cities=${citiesParam}&departureStart=${encodeURIComponent(departureStart)}&departureEnd=${encodeURIComponent(departureEnd)}&arrivalStart=${encodeURIComponent(arrivalStart)}&arrivalEnd=${encodeURIComponent(arrivalEnd)}&budget=${encodeURIComponent(budget)}`;
+                    window.location.href = url;
                 }
-                const url = `/flights/decision_date?departure=${encodeURIComponent(departureDateStart)}&arrival=${encodeURIComponent(arrivalDateStart)}&budget=${encodeURIComponent(budget)}`;
-                window.location.href = url;
-            } else if (scheduleChecked) {
-                // 일정이 정해진 경우
-                if (selectedCities.length === 0) {
-                    alert("도시를 선택해주세요.");
-                    return;
-                }
+
+            } else {
+                // 숙박 일수
                 const stayDuration = $('#stay-duration').val();
                 if (!stayDuration) {
                     alert("숙박 일수를 선택해주세요.");
                     return;
                 }
-                const citiesParam = encodeURIComponent(selectedCities.join(','));
-                const url = `/flights/decision_city?cities=${citiesParam}&stay-duration=${stayDuration}&budget=${encodeURIComponent(budget)}`;
-                window.location.href = url;
+
+                if (destinationChecked) {
+                    // 여행지를 안 정했음 => /flights/decision_date
+                    const url = `/flights/decision_date?stayDuration=${encodeURIComponent(stayDuration)}&budget=${encodeURIComponent(budget)}`;
+                    window.location.href = url;
+                } else {
+                    // 도시 선택 => /flights/decision_all
+                    if (selectedCities.length === 0) {
+                        alert("여행지를 최소 1개 선택하거나 '아직 여행지를 안 정했어요'를 체크하세요.");
+                        return;
+                    }
+                    const citiesParam = encodeURIComponent(selectedCities.join(','));
+                    const url = `/flights/decision_all?cities=${citiesParam}&stayDuration=${encodeURIComponent(stayDuration)}&budget=${encodeURIComponent(budget)}`;
+                    window.location.href = url;
+                }
             }
         });
-
     });
-
-
 </script>
 {% endblock %}

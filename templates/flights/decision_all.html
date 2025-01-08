@@ -1,4 +1,3 @@
-<!-- templates/travel_info.html -->
 {% extends 'base.html' %}
 
 {% block title %}여행 정보{% endblock %}
@@ -14,69 +13,147 @@
         <a href="/flights" class="text-decoration-none">
             <h1 class="fw-bold text-primary">Life Is Travel</h1>
         </a>
-        <p class="text-center text-muted">여행은 가고 싶은데, 어떻게 할 지 모르겠어. 도와줘! - 여행지, 일정범위 정했을 때</p>
+        <p class="text-center text-muted">
+            여행은 가고 싶은데, 어떻게 할 지 모르겠어. 도와줘!
+        </p>
     </div>
 </div>
-<!-- Travel Information -->
-<div id="travel-info" class="mt-5">
-    <div class="container">
-        <h2 class="mb-4">여행 정보</h2>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">예산</h5>
-                        <p class="card-text" id="budget"></p>
-                    </div>
+
+<!-- 검색 조건 요약 영역 -->
+<div class="container my-4">
+    <h2 class="mb-4">여행 정보</h2>
+    <div class="row g-3">
+        <!-- 예산 -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-info">
+                <div class="card-body">
+                    <h5 class="card-title">예산</h5>
+                    <p class="card-text">
+                        {{ budget }} 원
+                    </p>
                 </div>
             </div>
-            <div class="col-md-6 mb-3">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">출발일(범위)</h5>
-                        <p class="card-text" id="departure"></p>
-                    </div>
+        </div>
+        <!-- 출발일 (범위) -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-primary">
+                <div class="card-body">
+                    <h5 class="card-title">출발일(범위)</h5>
+                    <p class="card-text">
+                        {% if departure_start and departure_end %}
+                            {{ departure_start }} ~ {{ departure_end }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </p>
                 </div>
             </div>
-            <div class="col-md-6 mb-3">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">여행지</h5>
-                        <p class="card-text" id="cities"></p>
-                    </div>
+        </div>
+        <!-- 도착일 (범위) -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-warning">
+                <div class="card-body">
+                    <h5 class="card-title">도착일(범위)</h5>
+                    <p class="card-text">
+                        {% if arrival_start and arrival_end %}
+                            {{ arrival_start }} ~ {{ arrival_end }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </p>
                 </div>
             </div>
-            <div class="col-md-6 mb-3">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">도착일(범위)</h5>
-                        <p class="card-text" id="arrival"></p>
-                    </div>
+        </div>
+        <!-- 여행지(도시들) -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-success">
+                <div class="card-body">
+                    <h5 class="card-title">여행지</h5>
+                    <p class="card-text">
+                        {% if cities %}
+                            {{ cities|join:", " }}
+                        {% else %}
+                            미정
+                        {% endif %}
+                    </p>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<script>
-    // URL에서 파라미터를 추출하는 함수
-    function getUrlParams() {
-        const params = new URLSearchParams(window.location.search);
-        return {
-            cities: params.get('cities'),           // 도시
-            departure: params.get('departure'),     // 출발일(범위)
-            arrival: params.get('arrival'),         // 도착일(범위)
-            budget: params.get('budget'),           // 예산
-        };
-    }
+<!-- 비행기+호텔 조합 리스트 -->
+<div class="container mb-5">
+    <h2 class="mb-3">추천 조합</h2>
 
-    // 페이지 로드 시 파라미터를 추출하여 변수에 저장
-    const params = getUrlParams();
+    {% if results and results|length > 0 %}
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+            {% for item in results %}
+                <!-- item: {'flight': flight_obj, 'hotel': hotel_obj, 'total_cost': ...} -->
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            총 비용: {{ item.total_cost|floatformat:0 }} 원
+                        </div>
+                        <div class="card-body">
+                            <!-- 비행기 정보 -->
+                            <h5 class="card-title text-primary mb-2">
+                                ✈ 항공 : {{ item.flight.airline }}
+                                ({{ item.flight.departure }} → {{ item.flight.destination }})
+                            </h5>
+                            <ul class="list-group list-group-flush mb-3">
+                                <li class="list-group-item">
+                                    <strong>출발일:</strong>
+                                    {{ item.flight.departure_date }} {{ item.flight.departure_time|default_if_none:"" }}
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>리턴일:</strong>
+                                    {{ item.flight.return_date }} {{ item.flight.return_time|default_if_none:"" }}
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>항공권 가격:</strong> {{ item.flight.price|floatformat:0 }} 원
+                                </li>
+                                {% if item.flight.url %}
+                                    <li class="list-group-item">
+                                        <strong>예매 링크:</strong>
+                                        <a href="{{ item.flight.url }}" target="_blank">
+                                            바로 가기
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
 
-    // 여행 정보 표시
-    document.getElementById("cities").innerText = decodeURIComponent(params.cities).split(',').join(', ');
-    document.getElementById("departure").innerText = params.departure;
-    document.getElementById("arrival").innerText = params.arrival;
-    document.getElementById("budget").innerText = `${params.budget} 원`;
-</script>
+                            <!-- 호텔 정보 -->
+                            <h5 class="card-title text-success mb-2">
+                                \u{1F3E8} 호텔 : {{ item.hotel.hotel_name }}
+                                ({{ item.hotel.city }})
+                            </h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <strong>체크인:</strong> {{ item.hotel.check_in }}
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>체크아웃:</strong> {{ item.hotel.check_out }}
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>숙박 가격:</strong> {{ item.hotel.price|floatformat:0 }} 원
+                                </li>
+                                {% if item.hotel.url %}
+                                    <li class="list-group-item">
+                                        <strong>예약 링크:</strong>
+                                        <a href="{{ item.hotel.url }}" target="_blank">
+                                            바로 가기
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-muted">현재 조건에 맞는 조합이 없습니다.</p>
+    {% endif %}
+</div>
 {% endblock %}
