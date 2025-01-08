@@ -1,0 +1,82 @@
+<!-- templates/travel_info.html -->
+{% extends 'base.html' %}
+
+{% block title %}여행 정보{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="header text-center py-3 position-relative" style="background-color: #f0f0f0;">
+    <!-- 이전 페이지 버튼을 왼쪽에 고정 -->
+    <a href="/flights" class="btn btn-secondary position-absolute"
+       style="left: 3%; top: 50%; transform: translateY(-50%);">메인 페이지</a>
+    <!-- 중앙 정렬된 제목과 설명 -->
+    <div class="d-flex flex-column align-items-center justify-content-center">
+        <a href="/flights" class="text-decoration-none">
+            <h1 class="fw-bold text-primary">Life Is Travel</h1>
+        </a>
+        <p class="text-center text-muted">여행은 가고 싶은데, 어떻게 할 지 모르겠어. 도와줘! - 여행지, 일정범위 정했을 때</p>
+    </div>
+</div>
+<!-- Travel Information -->
+<div id="travel-info" class="mt-5">
+    <div class="container">
+        <h2 class="mb-4">여행 정보</h2>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">예산</h5>
+                        <p class="card-text" id="budget"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">출발일(범위)</h5>
+                        <p class="card-text" id="departure"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">여행지</h5>
+                        <p class="card-text" id="cities"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">도착일(범위)</h5>
+                        <p class="card-text" id="arrival"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // URL에서 파라미터를 추출하는 함수
+    function getUrlParams() {
+        const params = new URLSearchParams(window.location.search);
+        return {
+            cities: params.get('cities'),           // 도시
+            departure: params.get('departure'),     // 출발일(범위)
+            arrival: params.get('arrival'),         // 도착일(범위)
+            budget: params.get('budget'),           // 예산
+        };
+    }
+
+    // 페이지 로드 시 파라미터를 추출하여 변수에 저장
+    const params = getUrlParams();
+
+    // 여행 정보 표시
+    document.getElementById("cities").innerText = decodeURIComponent(params.cities).split(',').join(', ');
+    document.getElementById("departure").innerText = params.departure;
+    document.getElementById("arrival").innerText = params.arrival;
+    document.getElementById("budget").innerText = `${params.budget} 원`;
+</script>
+{% endblock %}

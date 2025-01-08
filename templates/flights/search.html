@@ -2,18 +2,27 @@
 {% load static %}
 
 {% block content %}
-<div class="container py-5">
-    <!-- Header -->
-    <header class="mb-4">
-        <h1 class="text-center fw-bold text-primary">Life Is Travel</h1>
-        <p class="text-center text-muted">항공권 검색을 쉽게 하고 여행을 계획하세요!</p>
-    </header>
 
+<!-- Header -->
+<div class="header text-center py-3 position-relative" style="background-color: #f0f0f0;">
+    <!-- 이전 페이지 버튼을 왼쪽에 고정 -->
+    <a href="/flights" class="btn btn-secondary position-absolute"
+       style="left: 3%; top: 50%; transform: translateY(-50%);">메인 페이지</a>
+    <!-- 중앙 정렬된 제목과 설명 -->
+    <div class="d-flex flex-column align-items-center justify-content-center">
+        <a href="/flights" class="text-decoration-none">
+            <h1 class="fw-bold text-primary">Life Is Travel</h1>
+        </a>
+        <p class="text-center text-muted">항공권 정보를 보여줘</p>
+    </div>
+</div>
+
+<div class="container py-5">
     <!-- Search Form -->
     <div class="card shadow-sm mx-auto" style="max-width: 600px;">
         <div class="card-body">
             <h5 class="card-title text-center mb-4">항공권 검색</h5>
-            <form method="GET" action="{% url 'flight_search' %}">
+            <form id="flightSearchForm" method="GET">
                 <!-- Trip Type Selector -->
                 <div class="mb-3">
                     <label for="tripType" class="form-label fw-bold">여정 선택</label>
@@ -49,12 +58,13 @@
 
                 <!-- Search Button -->
                 <div class="d-grid">
-                    <button type="submit" class="btn btn-primary btn-lg">검색</button>
+                    <button type="button" class="btn btn-primary btn-lg" onclick="searchFlight()">검색</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
 {% endblock %}
 
 {% block extra_js %}
@@ -67,5 +77,36 @@
             returnDateField.style.display = 'none';
         }
     });
+
+    function searchFlight() {
+        // 출발지, 도착지, 출발일, 도착일(왕복인 경우)을 변수에 저장
+        const departure = document.getElementById('departure').value;
+        const destination = document.getElementById('destination').value;
+        const departureDate = document.getElementById('departureDate').value;
+        const returnDate = document.getElementById('returnDate') ? document.getElementById('returnDate').value : '';
+
+        // 하나라도 빈 값이면 경고 메시지를 띄우고 함수 종료
+        if (!departure || !destination || !departureDate || (document.getElementById('tripType').value === '왕복' && !returnDate)) {
+            alert('모든 필드를 입력해 주세요.');
+            return;
+        }
+
+        // 출발일이 현재 날짜보다 이전인 경우 경고 메시지 표시
+        const today = new Date().toISOString().split('T')[0]; // 오늘 날짜 (yyyy-mm-dd 형식)
+        if (departureDate < today) {
+            alert('출발일은 오늘 날짜 이후로 선택해주세요.');
+            return;
+        }
+
+        // 출발일이 도착일보다 미래인 경우 경고 메시지 표시
+        if (document.getElementById('tripType').value === '왕복' && new Date(departureDate) > new Date(returnDate)) {
+            alert('출발일이 도착일보다 늦을 수 없습니다.');
+            return;
+        }
+
+        // 페이지 이동
+        const url = `/flights/details?departure=${encodeURIComponent(departure)}&destination=${encodeURIComponent(destination)}&departureDate=${encodeURIComponent(departureDate)}&returnDate=${encodeURIComponent(returnDate)}`;
+        window.location.href = url;
+    }
 </script>
 {% endblock %}
