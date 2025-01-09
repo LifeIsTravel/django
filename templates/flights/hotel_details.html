@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+<div class="header text-center py-3 position-relative" style="background-color: #f0f0f0;">
+    <a href="/hotels" class="btn btn-secondary position-absolute"
+       style="left: 3%; top: 50%; transform: translateY(-50%);">메인 페이지</a>
+    <div class="d-flex flex-column align-items-center justify-content-center">
+        <a href="/hotels" class="text-decoration-none">
+            <h1 class="fw-bold text-primary">Explore Japan Hotels</h1>
+        </a>
+        <p class="text-center text-muted">호텔 정보를 확인하세요!</p>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <div class="text-center mb-4">
+        <h1 class="text-primary">호텔 리스트</h1>
+        <p class="text-muted">정렬 옵션을 선택하세요:</p>
+        <div class="btn-group">
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort=price"
+               class="btn btn-outline-primary {% if sort_by == 'price' %}active{% endif %}">
+                가격순
+            </a>
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort=rating"
+               class="btn btn-outline-primary {% if sort_by == 'rating' %}active{% endif %}">
+                평점순
+            </a>
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort=distance"
+               class="btn btn-outline-primary {% if sort_by == 'distance' %}active{% endif %}">
+                장소와 거리순
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    {% if hotels %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-primary text-center">
+                    <tr>
+                        <th>호텔명</th>
+                        <th>도시명</th>
+                        <th>장소명</th>
+                        <th>평점</th>
+                        <th>체크인 시간</th>
+                        <th>체크아웃 시간</th>
+                        <th>장소-호텔 거리 (km)</th>
+                        <th>예약 링크</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for hotel in hotels %}
+                    <tr class="text-center">
+                        <td>{{ hotel.name }}</td>
+                        <td>{{ hotel.city }}</td>
+                        <td>{{ hotel.place }}</td>
+                        <td>{{ hotel.rating }}</td>
+                        <td>{{ hotel.checkin_time }}</td>
+                        <td>{{ hotel.checkout_time }}</td>
+                        <td>{{ hotel.distance|floatformat:1 }}</td>
+                        <td>
+                            <a href="{{ hotel.url }}" target="_blank" class="btn btn-sm btn-primary">
+                                예약하기
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="text-center text-muted">검색 결과가 없습니다.</p>
+    {% endif %}
+</div>
+{% endblock %}
