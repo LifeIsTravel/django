@@ -4,32 +4,77 @@
 {% block title %}Life Is Travel{% endblock %}
 
 {% block content %}
+
+{% load static %}
 <div class="container-fluid p-0">
     <!-- Header -->
-    <div class="header text-center py-3 position-relative" style="background-color: #f0f0f0;">
+    <div class="header text-center py-4 position-relative" style="background-color: #f0f0f0;">
         <!-- 중앙 정렬된 제목과 설명 -->
         <div class="d-flex flex-column align-items-center justify-content-center">
             <a href="/flights" class="text-decoration-none">
                 <h1 class="fw-bold text-primary">Life Is Travel</h1>
             </a>
-            <p class="text-center text-muted">합리적으로 여행하자 </p>
+            <p class="text-center text-muted">합리적으로 여행하자</p>
         </div>
     </div>
 
-    <!-- Button Container -->
-    <div class="d-flex flex-column align-items-center justify-content-center" style="height: 66.66vh; margin-top: -40px;">
-        <button class="btn btn-primary btn-lg mb-4" onclick="location.href='/flights/search'">항공권 정보를 보여줘</button>
-        <br>
-        <br>
-        <button class="btn btn-primary btn-lg mb-4" onclick="location.href='/flights/decision'">여행은 가고 싶은데, 어떻게 할 지
-            모르겠어. 도와줘!
-        </button>
-    </div>
+    <!-- 4개의 카드 섹션 -->
+    <div class="container my-5">
+        <div class="row row-cols-1 row-cols-md-4 g-4 justify-content-center">
+            <!-- 1) 항공권 가격 -->
+            <div class="col">
+                <div class="card h-100 shadow-sm" style="cursor: pointer;" onclick="location.href='/flights/search'">
+                    <!-- 예시 아이콘/이미지 (비행기) -->
+                    <!-- 실제로는 static 파일을 사용하거나, 원하는 이미지 URL 사용 -->
+                    <img src="{% static 'admin/img/plane.png' %}" alt="plane">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">항공권 가격</h5>
+                        <p class="card-text text-muted">
+                            원하는 날짜, 노선을 가장 저렴한 가격으로 찾아보세요.
+                        </p>
+                    </div>
+                </div>
+            </div>
 
-    <!-- Footer Button -->
-    <button class="btn"
-            style="background-color: #FFCC00; position: fixed; bottom: 15%; right: 10%; padding: 10px 20px;"
-            onclick="location.href='/flights/cancellation'">오늘 내 항공편 결항될까?
-    </button>
+            <!-- 2) 호텔 가격 -->
+            <div class="col">
+                <div class="card h-100 shadow-sm" style="cursor: pointer;" onclick="location.href='/flights/hotels'">
+                    <img src="{% static 'admin/img/hotel.png' %}" alt="plane">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">호텔 가격</h5>
+                        <p class="card-text text-muted">
+                            다양한 지역, 다양한 등급의 호텔을 합리적인 가격으로!
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3) 조합 추천 -->
+            <div class="col">
+                <div class="card h-100 shadow-sm" style="cursor: pointer;" onclick="location.href='/flights/decision'">
+                    <img src="{% static 'admin/img/glass.png' %}" alt="plane">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">조합 추천</h5>
+                        <p class="card-text text-muted">
+                            항공권과 숙박을 함께 알아보고 여행을 계획해보세요.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4) 결항 예측 -->
+            <div class="col">
+                <div class="card h-100 shadow-sm" style="cursor: pointer;" onclick="location.href='/flights/cancellation'">
+                    <img src="{% static 'admin/img/percent.png' %}" alt="plane">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">결항 예측</h5>
+                        <p class="card-text text-muted">
+                            오늘 내 항공편이 결항될지 미리 확인해보세요.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

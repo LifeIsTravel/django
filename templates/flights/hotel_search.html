@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+{% block extra_css %}
+<style>
+    .place-card.selected {
+        border: 2px solid #007bff;
+        box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+    }
+</style>
+{% endblock %}
+
+<!-- Header -->
+<div class="header text-center py-3" style="background-color: #f8f9fa;">
+    <h1 class="fw-bold">Explore Japan Hotels</h1>
+    <p class="text-muted">일본 도시의 명소와 호텔 정보를 확인하세요</p>
+</div>
+
+<!-- Tabs for City Selection -->
+<div class="container mt-3">
+    <ul class="nav nav-tabs justify-content-center" id="cityTabs" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active" id="tokyo-tab" data-bs-toggle="tab" data-bs-target="#tokyo" type="button" role="tab">도쿄</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="osaka-tab" data-bs-toggle="tab" data-bs-target="#osaka" type="button" role="tab">오사카</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="sapporo-tab" data-bs-toggle="tab" data-bs-target="#sapporo" type="button" role="tab">삿포로</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="fukuoka-tab" data-bs-toggle="tab" data-bs-target="#fukuoka" type="button" role="tab">후쿠오카</button>
+        </li>
+    </ul>
+</div>
+
+<!-- Search Form -->
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-body">
+            <h5 class="card-title text-center">호텔 검색</h5>
+            <form id="hotelSearchForm" method="GET" action="/hotels/search" onsubmit="return searchHotel(event)">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="checkinDate" class="form-label">체크인</label>
+                        <input type="date" id="checkinDate" name="checkinDate" class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="checkoutDate" class="form-label">체크아웃</label>
+                        <input type="date" id="checkoutDate" name="checkoutDate" class="form-control">
+                    </div>
+                </div>
+                <input type="hidden" id="selectedPlaceInput" name="place" value=""> <!-- Hidden input for selected place -->
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">검색</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Tab Content for Cities -->
+<div class="tab-content container mt-4">
+    <!-- Tokyo -->
+    <div class="tab-pane fade show active" id="tokyo" role="tabpanel">
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for place in places_tokyo %}
+            <div class="col">
+                <div class="card h-100 place-card" onclick="selectPlace(this, '{{ place.name }}')">
+                    <img src="{% static 'images/tokyo/'|add:place.image %}" class="card-img-top" alt="{{ place.name }}">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ place.name }}</h5>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Osaka -->
+    <div class="tab-pane fade" id="osaka" role="tabpanel">
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for place in places_osaka %}
+            <div class="col">
+                <div class="card h-100 place-card" onclick="selectPlace(this, '{{ place.name }}')">
+                    <img src="{% static 'images/osaka/'|add:place.image %}" class="card-img-top" alt="{{ place.name }}">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ place.name }}</h5>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Sapporo -->
+    <div class="tab-pane fade" id="sapporo" role="tabpanel">
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for place in places_sapporo %}
+            <div class="col">
+                <div class="card h-100 place-card" onclick="selectPlace(this, '{{ place.name }}')">
+                    <img src="{% static 'images/sapporo/'|add:place.image %}" class="card-img-top" alt="{{ place.name }}">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ place.name }}</h5>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Fukuoka -->
+    <div class="tab-pane fade" id="fukuoka" role="tabpanel">
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for place in places_osaka %}
+            <div class="col">
+                <div class="card h-100 place-card" onclick="selectPlace(this, '{{ place.name }}')">
+                    <img src="{% static 'images/fukuoka/'|add:place.image %}" class="card-img-top" alt="{{ place.name }}">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ place.name }}</h5>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let selectedPlace = null;
+
+    function selectPlace(card, placeName) {
+        // 모든 카드에서 선택 표시 제거
+        const allCards = document.querySelectorAll('.place-card');
+        allCards.forEach(card => card.classList.remove('selected'));
+
+        // 현재 클릭된 카드에 선택 표시 추가
+        card.classList.add('selected');
+        selectedPlace = placeName; // 선택된 명소 저장
+        document.getElementById('selectedPlaceInput').value = placeName; // 선택된 명소를 hidden input에 저장
+    }
+
+    function searchHotel(event) {
+        const checkinDate = document.getElementById('checkinDate').value;
+        const checkoutDate = document.getElementById('checkoutDate').value;
+
+        // 필수 입력값 확인
+        if (!selectedPlace || !checkinDate || !checkoutDate) {
+            alert('모든 필드를 입력해 주세요.');
+            event.preventDefault(); // 폼 제출을 막음
+            return false;
+        }
+
+        // 체크인 날짜 유효성 검사
+        const today = new Date().toISOString().split('T')[0];
+        if (checkinDate < today) {
+            alert('체크인 날짜는 오늘 이후로 선택해주세요.');
+            event.preventDefault(); // 폼 제출을 막음
+            return false;
+        }
+
+        // 체크아웃 날짜 유효성 검사
+        if (new Date(checkinDate) >= new Date(checkoutDate)) {
+            alert('체크아웃 날짜는 체크인 날짜보다 늦어야 합니다.');
+            event.preventDefault(); // 폼 제출을 막음
+            return false;
+        }
+
+        return true; // 모든 유효성 검사 후에 폼이 제출됨
+    }
+
+</script>
+{% endblock %}
