@@ -11,7 +11,7 @@
     <div class="header text-center py-4 position-relative" style="background-color: #f0f0f0;">
         <!-- 중앙 정렬된 제목과 설명 -->
         <div class="d-flex flex-column align-items-center justify-content-center">
-            <a href="/flights" class="text-decoration-none">
+            <a href="" class="text-decoration-none">
                 <h1 class="fw-bold text-primary">Life Is Travel</h1>
             </a>
             <p class="text-center text-muted">합리적으로 여행하자</p>
@@ -23,7 +23,7 @@
         <div class="row row-cols-1 row-cols-md-4 g-4 justify-content-center">
             <!-- 1) 항공권 가격 -->
             <div class="col">
-                <div class="card h-100 shadow-sm" style="cursor: pointer;" onclick="location.href='/flights/search'">
+                <div class="card h-100 shadow-sm" style="cursor: pointer;" onclick="location.href='/flights'">
                     <!-- 예시 아이콘/이미지 (비행기) -->
                     <!-- 실제로는 static 파일을 사용하거나, 원하는 이미지 URL 사용 -->
                     <img src="{% static 'admin/img/plane.png' %}" alt="plane">
@@ -38,7 +38,7 @@
 
             <!-- 2) 호텔 가격 -->
             <div class="col">
-                <div class="card h-100 shadow-sm" style="cursor: pointer;" onclick="location.href='/flights/hotels'">
+                <div class="card h-100 shadow-sm" style="cursor: pointer;" onclick="location.href='../hotels'">
                     <img src="{% static 'admin/img/hotel.png' %}" alt="plane">
                     <div class="card-body text-center">
                         <h5 class="card-title">호텔 가격</h5>
@@ -51,7 +51,7 @@
 
             <!-- 3) 조합 추천 -->
             <div class="col">
-                <div class="card h-100 shadow-sm" style="cursor: pointer;" onclick="location.href='/flights/decision'">
+                <div class="card h-100 shadow-sm" style="cursor: pointer;" onclick="location.href='/recommendation'">
                     <img src="{% static 'admin/img/glass.png' %}" alt="plane">
                     <div class="card-body text-center">
                         <h5 class="card-title">조합 추천</h5>
@@ -64,7 +64,7 @@
 
             <!-- 4) 결항 예측 -->
             <div class="col">
-                <div class="card h-100 shadow-sm" style="cursor: pointer;" onclick="location.href='/flights/cancellation'">
+                <div class="card h-100 shadow-sm" style="cursor: pointer;" onclick="location.href='/prediction'">
                     <img src="{% static 'admin/img/percent.png' %}" alt="plane">
                     <div class="card-body text-center">
                         <h5 class="card-title">결항 예측</h5>

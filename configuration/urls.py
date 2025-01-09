@@ -19,8 +19,13 @@ from xml.etree.ElementInclude import include
 from django.contrib import admin
 from django.urls import path, include
 
+from configuration import views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', views.home),
     path('flights/', include('flights.urls')),
-
+    path('hotels/', include('hotels.urls')),
+    path('recommendation/', include('recommendation.urls')),
+    path('prediction/', include('prediction.urls')),
 ]

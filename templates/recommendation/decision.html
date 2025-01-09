@@ -8,12 +8,12 @@
     <!-- 페이지 헤더 -->
     <div class="text-center mb-4 position-relative" style="background-color: #f0f0f0;">
         <!-- 메인 페이지 버튼 -->
-        <a href="/flights" class="btn btn-secondary position-absolute"
+        <a href="/" class="btn btn-secondary position-absolute"
            style="left: 2%; top: 50%; transform: translateY(-50%);">
            메인 페이지
         </a>
         <div class="py-3">
-            <a href="/flights" class="text-decoration-none">
+            <a href="/" class="text-decoration-none">
                 <h1 class="fw-bold text-primary">Life Is Travel</h1>
             </a>
             <p class="text-muted">여행은 가고 싶은데, 어떻게 할 지 모르겠어. 도와줘!</p>
@@ -323,17 +323,17 @@
                 }
 
                 if (destinationChecked) {
-                    // 여행지를 안 정했음 => /flights/decision_date
-                    const url = `/flights/decision_date?departureStart=${encodeURIComponent(departureStart)}&departureEnd=${encodeURIComponent(departureEnd)}&arrivalStart=${encodeURIComponent(arrivalStart)}&arrivalEnd=${encodeURIComponent(arrivalEnd)}&budget=${encodeURIComponent(budget)}`;
+                    // 여행지를 안 정했음 => /recommendation/decision_date
+                    const url = `/recommendation/decision_date?departureStart=${encodeURIComponent(departureStart)}&departureEnd=${encodeURIComponent(departureEnd)}&arrivalStart=${encodeURIComponent(arrivalStart)}&arrivalEnd=${encodeURIComponent(arrivalEnd)}&budget=${encodeURIComponent(budget)}`;
                     window.location.href = url;
                 } else {
-                    // 지도에서 도시 선택 => /flights/decision_all
+                    // 지도에서 도시 선택 => /recommendation/decision_all
                     if (selectedCities.length === 0) {
                         alert("여행지를 최소 1개 선택하거나 '아직 여행지를 안 정했어요'를 체크하세요.");
                         return;
                     }
                     const citiesParam = encodeURIComponent(selectedCities.join(','));
-                    const url = `/flights/decision_all?cities=${citiesParam}&departureStart=${encodeURIComponent(departureStart)}&departureEnd=${encodeURIComponent(departureEnd)}&arrivalStart=${encodeURIComponent(arrivalStart)}&arrivalEnd=${encodeURIComponent(arrivalEnd)}&budget=${encodeURIComponent(budget)}`;
+                    const url = `/recommendation/decision_all?cities=${citiesParam}&departureStart=${encodeURIComponent(departureStart)}&departureEnd=${encodeURIComponent(departureEnd)}&arrivalStart=${encodeURIComponent(arrivalStart)}&arrivalEnd=${encodeURIComponent(arrivalEnd)}&budget=${encodeURIComponent(budget)}`;
                     window.location.href = url;
                 }
 
@@ -346,17 +346,17 @@
                 }
 
                 if (destinationChecked) {
-                    // 여행지를 안 정했음 => /flights/decision_date
-                    const url = `/flights/decision_date?stayDuration=${encodeURIComponent(stayDuration)}&budget=${encodeURIComponent(budget)}`;
+                    // 여행지를 안 정했음 => /recommendation/decision_date
+                    const url = `/recommendation/decision_date?stayDuration=${encodeURIComponent(stayDuration)}&budget=${encodeURIComponent(budget)}`;
                     window.location.href = url;
                 } else {
-                    // 도시 선택 => /flights/decision_all
+                    // 도시 선택 => /recommendation/decision_all
                     if (selectedCities.length === 0) {
                         alert("여행지를 최소 1개 선택하거나 '아직 여행지를 안 정했어요'를 체크하세요.");
                         return;
                     }
                     const citiesParam = encodeURIComponent(selectedCities.join(','));
-                    const url = `/flights/decision_all?cities=${citiesParam}&stayDuration=${encodeURIComponent(stayDuration)}&budget=${encodeURIComponent(budget)}`;
+                    const url = `/recommendation/decision_all?cities=${citiesParam}&stayDuration=${encodeURIComponent(stayDuration)}&budget=${encodeURIComponent(budget)}`;
                     window.location.href = url;
                 }
             }
