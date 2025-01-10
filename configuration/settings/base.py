@@ -34,6 +34,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'flights.apps.FlightsConfig',
+    'hotels.apps.HotelsConfig',
+    'recommendation.apps.RecommendationConfig',
+    'prediction.apps.PredictionConfig',
 ]
 
 MIDDLEWARE = [
