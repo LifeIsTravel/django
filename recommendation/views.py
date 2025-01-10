@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
 from flights.models import Flight
-from hotels.models import HotelAvailability,HotelSearch
+from hotels.models import hotels_availability,hotels_search
 
 # Create your views here.
 
@@ -42,7 +42,7 @@ def flight_decision_all(request):
         )
 
     # 3) Hotel 모델 필터링
-    hotels_qs = Hotel.objects.all()
+    hotels_qs = hotels_availability.objects.all()
 
     # 호텔의 city는 cities_list 중 하나여야 함
     if cities_list:

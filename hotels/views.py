@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.db.models import Q
 from django.db.models import Sum
-from .models import HotelAvailability, HotelSearch
+from .models import hotels_availability, hotels_search
 from datetime import datetime, timedelta
 # Create your views here.
 
@@ -66,13 +66,13 @@ def hotel_details(request):
         # 조회할 날짜 리스트 생성 (checkin부터 checkout 하루 전까지)
         stay_dates = [checkin_date_obj + timedelta(days=x) for x in range((checkout_date_obj - checkin_date_obj).days)]
         # 호텔 검색 (place_name으로 필터링)
-        hotel_search_results = HotelSearch.objects.filter(place_name=place)
+        hotel_search_results = hotels_search.objects.filter(place_name=place)
         hotel_ids = hotel_search_results.values_list('hotel_id', flat=True)
         final_results = []
 
         for hotel_id in hotel_ids:
             # 해당 호텔의 stay_dates 동안의 예약 가능 여부 확인
-            availability = HotelAvailability.objects.filter(
+            availability = hotels_availability.objects.filter(
                 hotel_id=hotel_id,
                 checkin_date__in=stay_dates,
                 is_available=True
