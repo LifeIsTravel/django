@@ -15,6 +15,7 @@ class hotels_availability(models.Model):
     class Meta:
         db_table = 'hotels_availability'  # ✅ 기존 테이블 이름과 연결
         managed = False
+        default_permissions = ()
 
     def __str__(self):
         return f"Hotel {self.hotel_id} Availability"
@@ -41,6 +42,7 @@ class hotels_search(models.Model):
     class Meta:
         db_table = 'hotels_search'  # ✅ 기존 테이블 이름과 연결
         managed = False
+        default_permissions = ()
 
     def __str__(self):
         return self.hotel_name
