@@ -23,7 +23,7 @@ class HotelSearch(models.Model):
     city_name_ko = models.CharField(max_length=50)
     place_id = models.CharField(max_length=100)
     place_name = models.CharField(max_length=200)
-    reviews_score = models.FloatField()
+    review_score = models.FloatField()
     review_score_word = models.CharField(max_length=50)
     review_nr = models.IntegerField()
     checkin_time = models.CharField(max_length=50)
