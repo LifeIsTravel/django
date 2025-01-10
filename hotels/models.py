@@ -12,6 +12,10 @@ class hotels_availability(models.Model):
     currency = models.CharField(max_length=3, null=True)
     updated_at = models.CharField(max_length=20, null=True)
 
+    class Meta:
+        db_table = 'hotels_availability'  # ✅ 기존 테이블 이름과 연결
+        managed = False
+
     def __str__(self):
         return f"Hotel {self.hotel_id} Availability"
 
@@ -33,6 +37,10 @@ class hotels_search(models.Model):
     longitude = models.FloatField()
     distance = models.FloatField()
     updated_at = models.DateTimeField()
+
+    class Meta:
+        db_table = 'hotels_search'  # ✅ 기존 테이블 이름과 연결
+        managed = False
 
     def __str__(self):
         return self.hotel_name
