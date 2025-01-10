@@ -1,8 +1,7 @@
 from django.shortcuts import render
 
 from flights.models import Flight
-from hotels.models import Hotel
-
+from hotels.models import HotelAvailability,HotelSearch
 
 # Create your views here.
 

@@ -2,20 +2,37 @@ from django.db import models
 
 # Create your models here.
 
-class Hotel(models.Model):
-    hotel_name = models.CharField(max_length=200)  # 호텔 이름
-    city = models.CharField(max_length=100)  # 도시명
-    address = models.CharField(max_length=300, null=True, blank=True)  # 주소
-    rating = models.FloatField(null=True, blank=True)  # 호텔 평점 (1~5 등)
+from django.db import models
 
-    check_in = models.DateField(null=True, blank=True)  # 체크인 날짜
-    check_out = models.DateField(null=True, blank=True)  # 체크아웃 날짜
-
-    star_rating = models.IntegerField(null=True, blank=True)  # 별 개수(성급)
-    price = models.DecimalField(max_digits=10, decimal_places=2, default=0)  # 숙박 가격
-
-    # 호텔 상세 페이지, 예약 URL 등 필요한 필드가 있으면 추가 가능
-    url = models.CharField(max_length=1000, null=True, blank=True)
+class HotelAvailability(models.Model):
+    hotel_id = models.IntegerField()
+    checkin_date = models.DateField()
+    is_available = models.BooleanField()
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=False)
+    currency = models.CharField(max_length=3, null=True)
+    updated_at = models.CharField(max_length=20, null=True)
 
     def __str__(self):
-        return f"{self.hotel_name} - {self.city} ({self.check_in}~{self.check_out})"
+        return f"Hotel {self.hotel_id} Availability"
+
+class HotelSearch(models.Model):
+    hotel_id = models.CharField(max_length=100)
+    hotel_name = models.CharField(max_length=200)
+    airport_code = models.CharField(max_length=3)
+    city_name = models.CharField(max_length=50)
+    city_name_ko = models.CharField(max_length=50)
+    place_id = models.CharField(max_length=100)
+    place_name = models.CharField(max_length=200)
+    reviews_score = models.FloatField()
+    review_score_word = models.CharField(max_length=50)
+    review_nr = models.IntegerField()
+    checkin_time = models.CharField(max_length=50)
+    checkout_time = models.CharField(max_length=50)
+    hotel_class = models.CharField(max_length=10)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    distance = models.FloatField()
+    updated_at = models.DateTimeField()
+
+    def __str__(self):
+        return self.hotel_name

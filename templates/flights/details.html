@@ -19,8 +19,8 @@
         <h1 class="text-primary">항공권 리스트</h1>
         <p class="text-muted">정렬 옵션을 선택하세요:</p>
         <div class="btn-group">
-            <a href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort=price"
-               class="btn btn-outline-primary {% if sort_by == 'price' %}active{% endif %}">
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort=amount"
+               class="btn btn-outline-primary {% if sort_by == 'amount' %}active{% endif %}">
                 가격순
             </a>
             <a href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort=airline"
@@ -52,14 +52,11 @@
                 <tbody>
                     {% for flight in flights %}
                     <tr class="text-center">
-                        <td>{{ flight.airline }}</td>
-                        <td>{{ flight.departure }}</td>
-                        <td>{{ flight.destination }}</td>
-                        <td>{{ flight.departure_date }}</td>
+                        <td>{{ flight.carrier_names }}</td>
+                        <td>{{ flight.departure_display_code }}</td>
+                        <td>{{ flight.arrival_display_code }}</td>
                         <td>{{ flight.departure_time }}</td>
-                        {% if flight.return_date and flight.return_time %}
-                            <td>{{ flight.return_date }}</td>
-                            <td>{{ flight.return_time }}</td>
+                        {% if flight.arrival_time and flight.arrival_time %}
                         {% endif %}
                         <td>₩{{ flight.price|intcomma }}</td>
                         <td>{{ flight.agent_name }}</td>
