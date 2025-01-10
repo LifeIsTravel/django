@@ -9,6 +9,34 @@
         border: 2px solid #007bff;
         box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
     }
+    .place-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .place-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .place-card img {
+        height: 200px;           /* 이미지 높이 고정 */
+        object-fit: cover;       /* 비율 유지하며 자르기 */
+        width: 100%;             /* 카드 너비에 맞춤 */
+    }
+
+    .place-card .card-body {
+        background-color: #fff;  /* 배경색 */
+        padding: 15px;
+    }
+
+    .place-card .card-title {
+        font-weight: bold;
+        font-size: 1.2rem;
+        color: #333;
+    }
 </style>
 {% endblock %}
 
@@ -17,7 +45,7 @@
     <a href="/" class="text-decoration-none">
             <h1 class="fw-bold text-primary">Life Is Travel</h1>
     </a>
-    <p class="text-muted">일본 도시의 명소와 호텔 정보를 확인하세요</p>
+    <p class="text-muted">일본 도시의 명소와 호텔 정보를 보여줘</p>
 </div>
 
 <!-- Tabs for City Selection -->
@@ -71,7 +99,7 @@
             {% for place in places_tokyo %}
             <div class="col">
                 <div class="card h-100 place-card" onclick="selectPlace(this, '{{ place.name }}')">
-                    <img src="{% static 'images/tokyo/'|add:place.image %}" class="card-img-top" alt="{{ place.name }}">
+                    <img src="{% static 'admin/img/tokyo/'|add:place.image %}" class="card-img-top" alt="{{ place.name }}">
                     <div class="card-body text-center">
                         <h5 class="card-title">{{ place.name }}</h5>
                     </div>
@@ -87,7 +115,7 @@
             {% for place in places_osaka %}
             <div class="col">
                 <div class="card h-100 place-card" onclick="selectPlace(this, '{{ place.name }}')">
-                    <img src="{% static 'images/osaka/'|add:place.image %}" class="card-img-top" alt="{{ place.name }}">
+                    <img src="{% static 'admin/img/osaka/'|add:place.image %}" class="card-img-top" alt="{{ place.name }}">
                     <div class="card-body text-center">
                         <h5 class="card-title">{{ place.name }}</h5>
                     </div>
@@ -103,7 +131,7 @@
             {% for place in places_sapporo %}
             <div class="col">
                 <div class="card h-100 place-card" onclick="selectPlace(this, '{{ place.name }}')">
-                    <img src="{% static 'images/sapporo/'|add:place.image %}" class="card-img-top" alt="{{ place.name }}">
+                    <img src="{% static 'admin/img/sapporo/'|add:place.image %}" class="card-img-top" alt="{{ place.name }}">
                     <div class="card-body text-center">
                         <h5 class="card-title">{{ place.name }}</h5>
                     </div>
@@ -116,10 +144,10 @@
     <!-- Fukuoka -->
     <div class="tab-pane fade" id="fukuoka" role="tabpanel">
         <div class="row row-cols-1 row-cols-md-3 g-4">
-            {% for place in places_osaka %}
+            {% for place in places_fukuoka %}
             <div class="col">
                 <div class="card h-100 place-card" onclick="selectPlace(this, '{{ place.name }}')">
-                    <img src="{% static 'images/fukuoka/'|add:place.image %}" class="card-img-top" alt="{{ place.name }}">
+                    <img src="{% static 'admin/img/fukuoka/'|add:place.image %}" class="card-img-top" alt="{{ place.name }}">
                     <div class="card-body text-center">
                         <h5 class="card-title">{{ place.name }}</h5>
                     </div>
