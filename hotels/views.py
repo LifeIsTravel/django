@@ -62,10 +62,11 @@ def hotel_details(request):
         # 날짜 변환
         checkin_date_obj = datetime.strptime(checkin_date, '%Y-%m-%d').date()
         checkout_date_obj = datetime.strptime(checkout_date, '%Y-%m-%d').date()
-
+        print(1)
         # 조회할 날짜 리스트 생성 (checkin부터 checkout 하루 전까지)
         stay_dates = [checkin_date_obj + timedelta(days=x) for x in range((checkout_date_obj - checkin_date_obj).days)]
         # 호텔 검색 (place_name으로 필터링)
+        print(place)
         hotel_search_results = hotels_search.objects.filter(place_name=place)
         print(hotel_search_results)
         hotel_ids = hotel_search_results.values_list('hotel_id', flat=True)
