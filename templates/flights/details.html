@@ -3,75 +3,425 @@
 {% load humanize %}
 
 {% block content %}
-<div class="header text-center py-3 position-relative" style="background-color: #f0f0f0;">
-    <a href="/" class="btn btn-secondary position-absolute"
-       style="left: 3%; top: 50%; transform: translateY(-50%);">메인 페이지</a>
-    <div class="d-flex flex-column align-items-center justify-content-center">
-        <a href="/" class="text-decoration-none">
-            <h1 class="fw-bold text-primary">Life Is Travel</h1>
-        </a>
-        <p class="text-center text-muted">항공권 정보를 확인하세요!</p>
+    <div class="header text-center py-3 position-relative" style="background-color: #f0f0f0;">
+        <a href="/" class="btn btn-secondary position-absolute"
+           style="left: 3%; top: 50%; transform: translateY(-50%);">메인 페이지</a>
+        <div class="d-flex flex-column align-items-center justify-content-center">
+            <a href="/" class="text-decoration-none">
+                <h1 class="fw-bold text-primary">Life Is Travel</h1>
+            </a>
+            <p class="text-center text-muted">항공권 정보를 확인하세요!</p>
+        </div>
     </div>
-</div>
 
-<div class="container mt-5">
+    <div class="container mt-5">
     <div class="text-center mb-4">
         <h1 class="text-primary">항공권 리스트</h1>
         <p class="text-muted">정렬 옵션을 선택하세요:</p>
         <div class="btn-group">
             <a href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort=amount"
-               class="btn btn-outline-primary {% if sort_by == 'amount' %}active{% endif %}">
-                가격순
-            </a>
+               class="btn btn-outline-primary {% if sort_by == 'amount' %}active{% endif %}">가격순</a>
             <a href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort=airline"
-               class="btn btn-outline-primary {% if sort_by == 'airline' %}active{% endif %}">
-                항공사 이름순
-            </a>
+               class="btn btn-outline-primary {% if sort_by == 'airline' %}active{% endif %}">항공사 이름순</a>
         </div>
     </div>
-</div>
-    {% if flights %}
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover">
-                <thead class="table-primary text-center">
+    <div>
+        {% if flight_combinations %}
+            <!-- 왕복 항공권 헤더 및 날짜 정보 -->
+            <div class="d-flex align-items-center mb-3">
+                <h2>왕복 항공권</h2>
+                <div class="ml-3">
+                    <small class="text-muted">
+                        {% if departure_date_display %}출발일: {{ departure_date_display }}{% endif %}
+                        {% if return_date_display %}<br>귀국일: {{ return_date_display }}{% endif %}
+                    </small>
+                </div>
+            </div>
+            <!-- 왕복 항공권 테이블 -->
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-primary text-center">
+                    <tr>
+                        <!-- 출발편 헤더 -->
+                        <th colspan="5">출발편</th>
+                        <!-- 복귀편 헤더 -->
+                        <th colspan="5">복귀편</th>
+                        <!-- 총 가격 -->
+                        <th>총 가격</th>
+                        <!-- 예약 링크 -->
+                        <th>예약 링크</th>
+                    </tr>
+                    <tr>
+                        <!-- 출발편 상세 헤더 -->
+                        <th>항공사</th>
+                        <th>출발지</th>
+                        <th>도착지</th>
+                        <th>출발 시간</th>
+                        <th>도착 시간</th>
+                        <!-- 복귀편 상세 헤더 -->
+                        <th>항공사</th>
+                        <th>출발지</th>
+                        <th>도착지</th>
+                        <th>출발 시간</th>
+                        <th>도착 시간</th>
+                        <!-- 총 가격 및 예약 링크 -->
+                        <th>총 가격</th>
+                        <th>예약하기</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for combination in flight_combinations %}
+                        <tr class="text-center">
+                            <!-- 출발편 정보 -->
+                            <td>{{ combination.outbound.carrier_names }}</td>
+                            <td>{{ combination.outbound.departure_display_code }}</td>
+                            <td>{{ combination.outbound.arrival_display_code }}</td>
+                            <td>{{ combination.outbound.departure_time }}</td>
+                            <td>{{ combination.outbound.arrival_time }}</td>
+
+                            <!-- 복귀편 정보 -->
+                            <td>{{ combination.inbound.carrier_names }}</td>
+                            <td>{{ combination.inbound.departure_display_code }}</td>
+                            <td>{{ combination.inbound.arrival_display_code }}</td>
+                            <td>{{ combination.inbound.departure_time }}</td>
+                            <td>{{ combination.inbound.arrival_time }}</td>
+
+                            <!-- 총 가격 -->
+                            <td>₩ {{ combination.total_price }}</td>
+
+                            <!-- 예약 링크 -->
+                            <td>
+                                <a href="{{ combination.outbound.url }}" target="_blank"
+                                   class="btn btn-sm btn-primary mb-1">
+                                    출발편 예약
+                                </a>
+                                <a href="{{ combination.inbound.url }}" target="_blank"
+                                   class="btn btn-sm btn-secondary">
+                                    복귀편 예약
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 왕복 항공권 페이지네이션 -->
+            {% if is_paginated %}
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link"
+                                   href="?page=1{% if request.GET.departure %}&departure={{ request.GET.departure }}{% endif %}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.departureDate %}&departureDate={{ request.GET.departureDate }}{% endif %}{% if request.GET.returnDate %}&returnDate={{ request.GET.returnDate }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}"
+                                   aria-label="First">
+                                    <span aria-hidden="true">&laquo;&laquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page=
+                                        {{ page_obj.previous_page_number }}{% if request.GET.departure %}&departure={{ request.GET.departure }}{% endif %}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.departureDate %}&departureDate={{ request.GET.departureDate }}{% endif %}{% if request.GET.returnDate %}&returnDate={{ request.GET.returnDate }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}"
+                                   aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                            <span class="page-link" aria-label="First">
+                                <span aria-hidden="true">&laquo;&laquo;</span>
+                            </span>
+                            </li>
+                            <li class="page-item disabled">
+                            <span class="page-link" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </span>
+                            </li>
+                        {% endif %}
+
+                        {% for num in paginator.page_range %}
+                            {% if num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+                                {% if num == page_obj.number %}
+                                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                                {% else %}
+                                    <li class="page-item"><a class="page-link" href="?page=
+                                            {{ num }}{% if request.GET.departure %}&departure={{ request.GET.departure }}{% endif %}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.departureDate %}&departureDate={{ request.GET.departureDate }}{% endif %}{% if request.GET.returnDate %}&returnDate={{ request.GET.returnDate }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=
+                                        {{ page_obj.next_page_number }}{% if request.GET.departure %}&departure={{ request.GET.departure }}{% endif %}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.departureDate %}&departureDate={{ request.GET.departureDate }}{% endif %}{% if request.GET.returnDate %}&returnDate={{ request.GET.returnDate }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}"
+                                   aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page=
+                                        {{ paginator.num_pages }}{% if request.GET.departure %}&departure={{ request.GET.departure }}{% endif %}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.departureDate %}&departureDate={{ request.GET.departureDate }}{% endif %}{% if request.GET.returnDate %}&returnDate={{ request.GET.returnDate }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}"
+                                   aria-label="Last">
+                                    <span aria-hidden="true">&raquo;&raquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                            <span class="page-link" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </span>
+                            </li>
+                            <li class="page-item disabled">
+                            <span class="page-link" aria-label="Last">
+                                <span aria-hidden="true">&raquo;&raquo;</span>
+                            </span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% elif flights %}
+            <!-- 편도 항공권 헤더 및 날짜 정보 -->
+            <div class="d-flex align-items-center mb-3">
+                <h2>편도 항공권</h2>
+                <div class="ml-3">
+                    <small class="text-muted">
+                        {% if departure_date_display %}출발일: {{ departure_date_display }}{% endif %}
+                    </small>
+                </div>
+            </div>
+            <!-- 편도 항공권 테이블 -->
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-primary text-center">
                     <tr>
                         <th>항공사</th>
                         <th>출발지</th>
                         <th>도착지</th>
-                        <th>출발일</th>
                         <th>출발 시간</th>
-                        {% if flights.0.return_date and flights.0.return_time %}
-                            <th>귀국일</th>
-                            <th>귀국 시간</th>
-                        {% endif %}
+                        <th>도착 시간</th>
                         <th>가격</th>
                         <th>바우처</th>
                         <th>예약 링크</th>
                     </tr>
-                </thead>
-                <tbody>
+                    </thead>
+                    <tbody>
                     {% for flight in flights %}
-                    <tr class="text-center">
-                        <td>{{ flight.carrier_names }}</td>
-                        <td>{{ flight.departure_display_code }}</td>
-                        <td>{{ flight.arrival_display_code }}</td>
-                        <td>{{ flight.departure_time }}</td>
-                        {% if flight.arrival_time and flight.arrival_time %}
-                        {% endif %}
-                        <td>₩{{ flight.price|intcomma }}</td>
-                        <td>{{ flight.agent_name }}</td>
-                        <td>
-                            <a href="{{ flight.url }}" target="_blank" class="btn btn-sm btn-primary">
-                                예약하기
-                            </a>
-                        </td>
-                    </tr>
+                        <tr class="text-center">
+                            <td>{{ flight.carrier_names }}</td>
+                            <td>{{ flight.departure_display_code }}</td>
+                            <td>{{ flight.arrival_display_code }}</td>
+                            <td>{{ flight.departure_time }}</td>
+                            <td>{{ flight.arrival_time }}</td>
+                            <td>₩ {{ flight.amount }}</td>
+                            <td>{{ flight.agent_name }}</td>
+                            <td>
+                                <a href="{{ flight.url }}" target="_blank" class="btn btn-sm btn-primary">
+                                    예약하기
+                                </a>
+                            </td>
+                        </tr>
                     {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    {% else %}
-        <p class="text-center text-muted">검색 결과가 없습니다.</p>
-    {% endif %}
-</div>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 편도 항공권 페이지네이션 -->
+            {% if is_paginated %}
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link"
+                                   href="?page=1{% if request.GET.departure %}&departure={{ request.GET.departure }}{% endif %}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.departureDate %}&departureDate={{ request.GET.departureDate }}{% endif %}{% if request.GET.returnDate %}&returnDate={{ request.GET.returnDate }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}"
+                                   aria-label="First">
+                                    <span aria-hidden="true">&laquo;&laquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page=
+                                        {{ page_obj.previous_page_number }}{% if request.GET.departure %}&departure={{ request.GET.departure }}{% endif %}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.departureDate %}&departureDate={{ request.GET.departureDate }}{% endif %}{% if request.GET.returnDate %}&returnDate={{ request.GET.returnDate }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}"
+                                   aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                            <span class="page-link" aria-label="First">
+                                <span aria-hidden="true">&laquo;&laquo;</span>
+                            </span>
+                            </li>
+                            <li class="page-item disabled">
+                            <span class="page-link" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </span>
+                            </li>
+                        {% endif %}
+
+                        {% for num in paginator.page_range %}
+                            {% if num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+                                {% if num == page_obj.number %}
+                                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                                {% else %}
+                                    <li class="page-item"><a class="page-link" href="?page=
+                                            {{ num }}{% if request.GET.departure %}&departure={{ request.GET.departure }}{% endif %}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.departureDate %}&departureDate={{ request.GET.departureDate }}{% endif %}{% if request.GET.returnDate %}&returnDate={{ request.GET.returnDate }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=
+                                        {{ page_obj.next_page_number }}{% if request.GET.departure %}&departure={{ request.GET.departure }}{% endif %}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.departureDate %}&departureDate={{ request.GET.departureDate }}{% endif %}{% if request.GET.returnDate %}&returnDate={{ request.GET.returnDate }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}"
+                                   aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page=
+                                        {{ paginator.num_pages }}{% if request.GET.departure %}&departure={{ request.GET.departure }}{% endif %}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.departureDate %}&departureDate={{ request.GET.departureDate }}{% endif %}{% if request.GET.returnDate %}&returnDate={{ request.GET.returnDate }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}"
+                                   aria-label="Last">
+                                    <span aria-hidden="true">&raquo;&raquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                            <span class="page-link" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </span>
+                            </li>
+                            <li class="page-item disabled">
+                            <span class="page-link" aria-label="Last">
+                                <span aria-hidden="true">&raquo;&raquo;</span>
+                            </span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% elif flights %}
+            <!-- 편도 항공권 헤더 및 날짜 정보 -->
+            <div class="d-flex align-items-center mb-3">
+                <h2>편도 항공권</h2>
+                <div class="ml-3">
+                    <small class="text-muted">
+                        {% if departure_date_display %}출발일: {{ departure_date_display }}{% endif %}
+                    </small>
+                </div>
+            </div>
+            <!-- 편도 항공권 테이블 -->
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-primary text-center">
+                    <tr>
+                        <th>항공사</th>
+                        <th>출발지</th>
+                        <th>도착지</th>
+                        <th>출발 시간</th>
+                        <th>도착 시간</th>
+                        <th>가격</th>
+                        <th>바우처</th>
+                        <th>예약 링크</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for flight in flights %}
+                        <tr class="text-center">
+                            <td>{{ flight.carrier_names }}</td>
+                            <td>{{ flight.departure_display_code }}</td>
+                            <td>{{ flight.arrival_display_code }}</td>
+                            <td>{{ flight.departure_time }}</td>
+                            <td>{{ flight.arrival_time }}</td>
+                            <td>₩ {{ flight.amount }}</td>
+                            <td>{{ flight.agent_name }}</td>
+                            <td>
+                                <a href="{{ flight.url }}" target="_blank" class="btn btn-sm btn-primary">
+                                    예약하기
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 편도 항공권 페이지네이션 -->
+            {% if is_paginated %}
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link"
+                                   href="?page=1{% if request.GET.departure %}&departure={{ request.GET.departure }}{% endif %}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.departureDate %}&departureDate={{ request.GET.departureDate }}{% endif %}{% if request.GET.returnDate %}&returnDate={{ request.GET.returnDate }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}"
+                                   aria-label="First">
+                                    <span aria-hidden="true">&laquo;&laquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page=
+                                        {{ page_obj.previous_page_number }}{% if request.GET.departure %}&departure={{ request.GET.departure }}{% endif %}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.departureDate %}&departureDate={{ request.GET.departureDate }}{% endif %}{% if request.GET.returnDate %}&returnDate={{ request.GET.returnDate }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}"
+                                   aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                            <span class="page-link" aria-label="First">
+                                <span aria-hidden="true">&laquo;&laquo;</span>
+                            </span>
+                            </li>
+                            <li class="page-item disabled">
+                            <span class="page-link" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </span>
+                            </li>
+                        {% endif %}
+
+                        {% for num in paginator.page_range %}
+                            {% if num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+                                {% if num == page_obj.number %}
+                                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                                {% else %}
+                                    <li class="page-item"><a class="page-link" href="?page=
+                                            {{ num }}{% if request.GET.departure %}&departure={{ request.GET.departure }}{% endif %}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.departureDate %}&departureDate={{ request.GET.departureDate }}{% endif %}{% if request.GET.returnDate %}&returnDate={{ request.GET.returnDate }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=
+                                        {{ page_obj.next_page_number }}{% if request.GET.departure %}&departure={{ request.GET.departure }}{% endif %}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.departureDate %}&departureDate={{ request.GET.departureDate }}{% endif %}{% if request.GET.returnDate %}&returnDate={{ request.GET.returnDate }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}"
+                                   aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page=
+                                        {{ paginator.num_pages }}{% if request.GET.departure %}&departure={{ request.GET.departure }}{% endif %}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.departureDate %}&departureDate={{ request.GET.departureDate }}{% endif %}{% if request.GET.returnDate %}&returnDate={{ request.GET.returnDate }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}"
+                                   aria-label="Last">
+                                    <span aria-hidden="true">&raquo;&raquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                            <span class="page-link" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </span>
+                            </li>
+                            <li class="page-item disabled">
+                            <span class="page-link" aria-label="Last">
+                                <span aria-hidden="true">&raquo;&raquo;</span>
+                            </span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <p class="text-center text-muted">검색 결과가 없습니다.</p>
+        {% endif %}
+    </div>
 {% endblock %}
