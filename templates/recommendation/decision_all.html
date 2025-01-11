@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}여행 정보{% endblock %}
+{% load humanize %}
 
 {% block content %}
 <!-- Header -->
@@ -29,7 +30,7 @@
                 <div class="card-body">
                     <h5 class="card-title">예산</h5>
                     <p class="card-text">
-                        {{ budget }} 원
+                        {{ budget|intcomma }} 원
                     </p>
                 </div>
             </div>
@@ -92,7 +93,7 @@
                 <div class="col">
                     <div class="card h-100 shadow-sm">
                         <div class="card-header bg-primary text-white">
-                            총 비용: {{ item.total_price|floatformat:0 }} 원
+                            총 비용: {{ item.total_price|floatformat:0|intcomma }} 원
                         </div>
                         <div class="card-body">
                             <!-- 비행기 정보 -->
@@ -107,7 +108,7 @@
                                     <strong>복귀일:</strong> {{ item.return.departure_date }}
                                 </li>
                                 <li class="list-group-item">
-                                    <strong>항공권 가격:</strong> {{ item.departure.amount|floatformat:0 }} + {{ item.return.price|floatformat:0 }} 원
+                                    <strong>항공권 가격:</strong> {{ item.departure.amount|floatformat:0|intcomma }} + {{ item.return.price|floatformat:0|intcomma }} 원
                                 </li>
                             </ul>
 
@@ -123,7 +124,7 @@
                                     <strong>체크아웃:</strong> {{ item.hotel.check_out }}
                                 </li>
                                 <li class="list-group-item">
-                                    <strong>숙박 가격:</strong> {{ item.hotel_price|floatformat:0 }} 원
+                                    <strong>숙박 가격:</strong> {{ item.hotel_price|floatformat:0|intcomma }} 원
                                 </li>
                             </ul>
                         </div>
