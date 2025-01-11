@@ -79,7 +79,7 @@ def hotel_details(request):
             # 예약 가능 날짜 수 확인
             if availability.count() == len(stay_dates):
                 # 모든 날짜가 예약 가능하면 가격 합산
-                total_price = availability.aggregate(total=Sum('price'))['total']
+                total_price = round(availability.aggregate(total=Sum('price'))['total'])
                 # 결과에 추가
                 hotel_info = hotel_search_results.get(hotel_id=hotel_id)
                 final_results.append({
