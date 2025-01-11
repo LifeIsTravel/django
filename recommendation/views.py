@@ -112,7 +112,7 @@ def flight_decision_all(request):
                             'hotel_price': hotel_price,
                             'total_price': total_price
                         })
-                        print(f"조합 추가됨: 항공 {dep_flight.id}, 호텔 {hotel_id}, 총합 {total_price}")
+                        print(f"조합 추가됨: 항공 {dep_flight.flight_id}, 호텔 {hotel_id}, 총합 {total_price}")
             except Exception as e:
                 print(f"호텔 {hotel_id} 처리 중 오류: {e}")
                 continue  # 오류 발생 시 다음 호텔로 넘어감
