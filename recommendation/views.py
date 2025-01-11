@@ -38,6 +38,8 @@ def flight_decision_all(request):
     arr_start_conv = convert_date(arrival_start)
     arr_end_conv   = convert_date(arrival_end)
 
+    print(dep_start_conv, dep_end_conv, arr_start_conv, arr_end_conv)
+
     # 3) 출발편 필터링 (출발 → 목적지)
     departure_flights = Flight.objects.filter(
         departure_date__gte=dep_start_conv,
@@ -45,22 +47,26 @@ def flight_decision_all(request):
         arrival_display_code__in=cities_list
     )
 
+    print(departure_flights)
     # 4) 복귀편 필터링 (목적지 → 출발지)
     return_flights = Flight.objects.filter(
         departure_date__gte=arr_start_conv,
         departure_date__lte=arr_end_conv,
         departure_display_code__in=cities_list
     )
+    print(return_flights)
 
     # 5) 호텔 정보 추출
     hotel_ids = hotels_search.objects.filter(
         airport_code__in=cities_list
     ).values_list('hotel_id', flat=True)
 
+    print(hotel_ids)
     hotels = hotels_availability.objects.filter(
         hotel_id__in=hotel_ids
     ).distinct('hotel_id')
 
+    print(hotels)
     # 6) 출발일~복귀일 숙박 가능 여부 확인
     valid_combinations = []
     for dep_flight, ret_flight in product(departure_flights, return_flights):
