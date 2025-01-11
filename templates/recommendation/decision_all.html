@@ -86,47 +86,34 @@
 <div class="container mb-5">
     <h2 class="mb-3">추천 조합</h2>
 
-    {% if results and results|length > 0 %}
+    {% if packages and packages|length > 0 %}
         <div class="row row-cols-1 row-cols-md-2 g-4">
-            {% for item in results %}
-                <!-- item: {'flight': flight_obj, 'hotel': hotel_obj, 'total_cost': ...} -->
+            {% for item in packages %}
                 <div class="col">
                     <div class="card h-100 shadow-sm">
                         <div class="card-header bg-primary text-white">
-                            총 비용: {{ item.total_cost|floatformat:0 }} 원
+                            총 비용: {{ item.total_price|floatformat:0 }} 원
                         </div>
                         <div class="card-body">
                             <!-- 비행기 정보 -->
                             <h5 class="card-title text-primary mb-2">
-                                ✈ 항공 : {{ item.flight.airline }}
-                                ({{ item.flight.departure }} → {{ item.flight.destination }})
+                                ✈ 항공 : {{ item.departure.airline }} ({{ item.departure.departure_display_code }} → {{ item.departure.arrival_display_code }})
                             </h5>
                             <ul class="list-group list-group-flush mb-3">
                                 <li class="list-group-item">
-                                    <strong>출발일:</strong>
-                                    {{ item.flight.departure_date }} {{ item.flight.departure_time|default_if_none:"" }}
+                                    <strong>출발일:</strong> {{ item.departure.departure_date }}
                                 </li>
                                 <li class="list-group-item">
-                                    <strong>리턴일:</strong>
-                                    {{ item.flight.return_date }} {{ item.flight.return_time|default_if_none:"" }}
+                                    <strong>복귀일:</strong> {{ item.return.departure_date }}
                                 </li>
                                 <li class="list-group-item">
-                                    <strong>항공권 가격:</strong> {{ item.flight.price|floatformat:0 }} 원
+                                    <strong>항공권 가격:</strong> {{ item.departure.price|floatformat:0 }} + {{ item.return.price|floatformat:0 }} 원
                                 </li>
-                                {% if item.flight.url %}
-                                    <li class="list-group-item">
-                                        <strong>예매 링크:</strong>
-                                        <a href="{{ item.flight.url }}" target="_blank">
-                                            바로 가기
-                                        </a>
-                                    </li>
-                                {% endif %}
                             </ul>
 
                             <!-- 호텔 정보 -->
                             <h5 class="card-title text-success mb-2">
-                                \u{1F3E8} 호텔 : {{ item.hotel.hotel_name }}
-                                ({{ item.hotel.city }})
+                                🏨 호텔 : {{ item.hotel.hotel_name }} ({{ item.hotel.city }})
                             </h5>
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item">
@@ -136,16 +123,8 @@
                                     <strong>체크아웃:</strong> {{ item.hotel.check_out }}
                                 </li>
                                 <li class="list-group-item">
-                                    <strong>숙박 가격:</strong> {{ item.hotel.price|floatformat:0 }} 원
+                                    <strong>숙박 가격:</strong> {{ item.hotel_price|floatformat:0 }} 원
                                 </li>
-                                {% if item.hotel.url %}
-                                    <li class="list-group-item">
-                                        <strong>예약 링크:</strong>
-                                        <a href="{{ item.hotel.url }}" target="_blank">
-                                            바로 가기
-                                        </a>
-                                    </li>
-                                {% endif %}
                             </ul>
                         </div>
                     </div>
