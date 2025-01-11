@@ -76,6 +76,8 @@ def flight_decision_all(request):
         stay_dates = [(checkin_date + timedelta(days=i)).strftime('%Y-%m-%d')
                       for i in range((checkout_date - checkin_date).days + 1)]
 
+        print(stay_dates)
+
         for hotel_id in hotel_ids:
             print(hotel_id)
             # 숙박 가능 여부 확인
