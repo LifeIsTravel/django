@@ -4,7 +4,8 @@ from django.db import models
 
 from django.db import models
 
-class hotels_availability(models.Model):
+class HotelAvailability(models.Model):
+    id = models.AutoField(primary_key=True)
     hotel_id = models.IntegerField()
     checkin_date = models.DateField()
     is_available = models.BooleanField()
@@ -19,7 +20,8 @@ class hotels_availability(models.Model):
     def __str__(self):
         return f"Hotel {self.hotel_id} Availability"
 
-class hotels_search(models.Model):
+class HotelSearch(models.Model):
+    id = models.AutoField(primary_key=True)
     hotel_id = models.CharField(max_length=100)
     hotel_name = models.CharField(max_length=200)
     airport_code = models.CharField(max_length=3)

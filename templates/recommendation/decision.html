@@ -112,7 +112,7 @@
                                 예산 (원)
                             </label>
                             <input type="text" class="form-control w-auto"
-                                   name="budget" id="budget" placeholder="예: 500000">
+                                   name="budget" id="budget" placeholder="예: 500,000" oninput="formatBudget(this)">
                         </div>
                     </div>
                 </div>
@@ -245,6 +245,17 @@
             $('#date-range-section').hide();
             $('#stay-duration-section').show();
         }
+    }
+    
+    function formatBudget(input) {
+        // 숫자만 남기기
+        let value = input.value.replace(/,/g, '');
+        
+        // 숫자로 변환 후, 3자리마다 쉼표 추가
+        let formattedValue = Number(value).toLocaleString('en-US');
+        
+        // 입력 필드에 포맷된 값 적용
+        input.value = formattedValue;
     }
 
     $(document).ready(function() {
