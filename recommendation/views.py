@@ -63,7 +63,7 @@ def flight_decision_all(request):
         airport_code__in=cities_list
     ).values_list('hotel_id', flat=True)
 
-    print(hotel_ids)
+    # print(hotel_ids)
 
     # 6) 출발일~복귀일 숙박 가능 여부 확인
     valid_combinations = []
