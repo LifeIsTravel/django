@@ -68,41 +68,54 @@ def flight_decision_all(request):
     # 6) 출발일~복귀일 숙박 가능 여부 확인
     valid_combinations = []
     for dep_flight, ret_flight in product(departure_flights, return_flights):
-        total_flight_price = dep_flight.price + ret_flight.price
+        try:
+            total_flight_price = dep_flight.price + ret_flight.price
 
-        # 숙박 기간 계산
-        checkin_date = datetime.strptime(dep_flight.departure_date, '%y%m%d')
-        checkout_date = datetime.strptime(ret_flight.departure_date, '%y%m%d')
-        stay_dates = [(checkin_date + timedelta(days=i)).strftime('%Y-%m-%d')
-                      for i in range((checkout_date - checkin_date).days + 1)]
-
-        print(stay_dates)
+            # 숙박 기간 계산
+            checkin_date = datetime.strptime(dep_flight.departure_date, '%y%m%d')
+            checkout_date = datetime.strptime(ret_flight.departure_date, '%y%m%d')
+            stay_dates = [(checkin_date + timedelta(days=i)).strftime('%Y-%m-%d')
+                          for i in range((checkout_date - checkin_date).days + 1)]
+            print(f"체크인~체크아웃 날짜: {stay_dates}")
+        except Exception as e:
+            print(f"날짜 또는 가격 계산 오류: {e}")
+            continue  # 오류 발생 시 다음 조합으로 넘어감
 
         for hotel_id in hotel_ids:
-            print(hotel_id)
-            # 숙박 가능 여부 확인
-            availability_records = hotels_availability.objects.filter(
-                hotel_id=hotel_id,
-                checkin_date__in=stay_dates
-            )
+            try:
+                print(f"호텔 ID: {hotel_id}")
 
-            # 숙박일 모두 예약 가능하고 가격이 있는지 확인
-            if all(record.is_available and record.price for record in availability_records):
-                # 숙박 가격 합산
-                hotel_price = sum(float(record.price) for record in availability_records)
+                # hotel_id 타입을 정수로 변환 (필요한 경우)
+                hotel_id = int(hotel_id)
 
-                # 항공권 + 호텔 가격 합산
-                total_price = total_flight_price + hotel_price
+                # 숙박 가능 여부 확인
+                availability_records = hotels_availability.objects.filter(
+                    hotel_id=hotel_id,
+                    checkin_date__in=stay_dates
+                )
+                print(f"호텔 {hotel_id} 숙박 기록: {availability_records}")
 
-                # 예산 이내인지 확인
-                if total_price <= budget:
-                    valid_combinations.append({
-                        'departure': dep_flight,
-                        'return': ret_flight,
-                        'hotel_id': hotel_id,
-                        'hotel_price': hotel_price,
-                        'total_price': total_price
-                    })
+                # 숙박일 모두 예약 가능하고 가격이 있는지 확인
+                if all(record.is_available and record.price for record in availability_records):
+                    # 숙박 가격 합산
+                    hotel_price = sum(float(record.price) for record in availability_records)
+
+                    # 항공권 + 호텔 가격 합산
+                    total_price = total_flight_price + hotel_price
+
+                    # 예산 이내인지 확인
+                    if total_price <= budget:
+                        valid_combinations.append({
+                            'departure': dep_flight,
+                            'return': ret_flight,
+                            'hotel_id': hotel_id,
+                            'hotel_price': hotel_price,
+                            'total_price': total_price
+                        })
+                        print(f"조합 추가됨: 항공 {dep_flight.id}, 호텔 {hotel_id}, 총합 {total_price}")
+            except Exception as e:
+                print(f"호텔 {hotel_id} 처리 중 오류: {e}")
+                continue  # 오류 발생 시 다음 호텔로 넘어감
 
     # 7) 결과 렌더링
     return render(request, 'recommendation/decision_all.html', {'packages': valid_combinations})
