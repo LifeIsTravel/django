@@ -12,21 +12,34 @@
         <a href="/" class="text-decoration-none">
             <h1 class="fw-bold text-primary">Life Is Travel</h1>
         </a>
-        <p class="text-center text-muted">오늘 내 항공편 결항될까?</p>
+        <p class="text-center text-muted">오늘 내 항공편 지연될까?</p>
     </div>
 </div>
 <div class="container mt-5">
     <!-- Form Section -->
     <div id="form-container" class="card p-4 shadow-sm mx-auto" style="max-width: 500px;">
         <form onsubmit="handleSubmit(event)">
+            <!-- 출발일자 -->
             <div class="mb-3">
                 <label for="departure-date" class="form-label">출발일자:</label>
                 <input type="date" id="departure-date" name="departure-date" class="form-control" required>
             </div>
+            <!-- 항공사 -->
             <div class="mb-3">
-                <label for="flight-number" class="form-label">편명:</label>
-                <input type="text" id="flight-number" name="flight-number" class="form-control" required>
+                <label for="airline" class="form-label">항공사:</label>
+                <input type="text" id="airline" name="airline" class="form-control" placeholder="예: 대한항공" required>
             </div>
+            <!-- 출발공항 -->
+            <div class="mb-3">
+                <label for="departure-airport" class="form-label">출발공항:</label>
+                <input type="text" id="departure-airport" name="departure-airport" class="form-control" placeholder="예: 인천" required>
+            </div>
+            <!-- 도착공항 -->
+            <div class="mb-3">
+                <label for="arrival-airport" class="form-label">도착공항:</label>
+                <input type="text" id="arrival-airport" name="arrival-airport" class="form-control" placeholder="예: 도쿄" required>
+            </div>
+            <!-- 출발시간 -->
             <div class="mb-3">
                 <label for="departure-time" class="form-label">출발시간:</label>
                 <input type="time" id="departure-time" name="departure-time" class="form-control" required>
@@ -38,7 +51,7 @@
     <!-- Result Section -->
     <div id="result-container" class="d-none text-center mt-4">
         <div class="alert alert-info" id="result-message">
-            <!-- 결항 확률 및 멘트가 여기에 출력됩니다 -->
+            <!-- 지연 확률 및 멘트가 여기에 출력됩니다 -->
         </div>
         <div class="card bg-light p-4 mt-3">
             <h5 class="text-secondary">도착지의 날씨 정보</h5>
@@ -54,11 +67,11 @@
         document.getElementById("form-container").classList.add("mb-4"); // 폼 아래 여백 추가
         document.getElementById("result-container").classList.remove("d-none"); // 결과 보여주기
 
-        // 결항 확률을 무작위로 설정 (예: 0% ~ 100%)
+        // 지연 확률을 무작위로 설정 (예: 0% ~ 100%)
         const probability = Math.floor(Math.random() * 101);
         const message = getMessage(probability);
 
-        document.getElementById("result-message").innerHTML = `오늘 항공편이 결항될 확률은 <strong>${probability}%</strong> 입니다.<br>${message}`;
+        document.getElementById("result-message").innerHTML = `오늘 항공편이 지연될 확률은 <strong>${probability}%</strong> 입니다.<br>${message}`;
     }
 
     function getMessage(probability) {
@@ -67,7 +80,7 @@
         } else if (probability < 50) {
             return "잠시 긴장을 해주세요.";
         } else {
-            return "결항될 가능성이 높습니다. 다른 준비를 고려하세요.";
+            return "지연될 가능성이 높습니다. 다른 준비를 고려하세요.";
         }
     }
 </script>
