@@ -107,7 +107,7 @@
                                     <strong>복귀일:</strong> {{ item.return.departure_date }}
                                 </li>
                                 <li class="list-group-item">
-                                    <strong>항공권 가격:</strong> {{ item.departure.price|floatformat:0 }} + {{ item.return.price|floatformat:0 }} 원
+                                    <strong>항공권 가격:</strong> {{ item.departure.amount|floatformat:0 }} + {{ item.return.price|floatformat:0 }} 원
                                 </li>
                             </ul>
 

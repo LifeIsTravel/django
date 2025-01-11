@@ -69,7 +69,7 @@ def flight_decision_all(request):
     valid_combinations = []
     for dep_flight, ret_flight in product(departure_flights, return_flights):
         try:
-            total_flight_price = dep_flight.price + ret_flight.price
+            total_flight_price = dep_flight.amount + ret_flight.amount
 
             # 숙박 기간 계산
             checkin_date = datetime.strptime(dep_flight.departure_date, '%y%m%d')
