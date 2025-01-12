@@ -67,6 +67,8 @@ def decision_all(request):
     # 항공권 + 호텔 시작
     combined_combinations = make_combined_combinations(all_flight_combinations, all_hotel_combinations)
     combined_combinations = check_budget(budget, combined_combinations)
+    combined_combinations = add_hotel_name_to_combined(combined_combinations)
+    print(combined_combinations[0])
     # print_combined_combinations(combined_combinations)
 
     # ================================================================================================================
@@ -140,6 +142,7 @@ def flight_decision_date(request):
     # 항공권 + 호텔 시작
     combined_combinations = make_combined_combinations(all_flight_combinations, all_hotel_combinations)
     combined_combinations = check_budget(budget, combined_combinations)
+    combined_combinations = add_hotel_name_to_combined(combined_combinations)
     # print_combined_combinations(combined_combinations)
 
     # ================================================================================================================
@@ -160,8 +163,119 @@ def flight_decision_date(request):
     })
 
 
-# def flight_decision_city(request):
-#     return render(request, 'flights/decision_city.html')
+def flight_decision_date_range(request):
+    cities_str = request.GET.get('cities', '')
+    print(cities_str)
+    cities_list = cities_str.split(',') if cities_str else []
+    if len(cities_list) == 0:
+        cities_list = ['NRT', 'KIX', 'FUK', 'CTS']
+    print(cities_list)
+
+    stay_duration = request.GET.get('stayDuration')
+    stay_duration = int(stay_duration)
+    print(stay_duration)
+
+    budget_str = request.GET.get('budget', '0')
+    budget_str = budget_str.replace(',', '')
+    try:
+        budget = int(budget_str)
+    except ValueError:
+        budget = 0
+    print(budget)
+
+    first_date, last_date = generate_first_last_date()
+    print("First Date (Tomorrow):", first_date)
+    print("Last Date:", last_date)
+
+    # ================================================================================================================
+    # 날짜 조합 만들기
+    all_combinations = generate_departure_arrival_dates(first_date, last_date, stay_duration)
+    print("all_combinations_length", len(all_combinations))
+    print(all_combinations)
+
+    # ================================================================================================================
+    # 항공권 시작
+    all_flight_combinations = make_all_flight_combinations(all_combinations, cities_list)
+    all_flight_combinations = filter_same_airports(all_flight_combinations)
+    # print_flight_combinations(all_flight_combinations)
+
+    # ================================================================================================================
+    # 호텔 시작
+    all_hotel_combinations = make_all_hotel_combinations(all_combinations)
+    all_hotel_combinations = extract_city_from_hotel(all_hotel_combinations, cities_list)
+    # print_hotel_combinations(all_hotel_combinations)
+
+    # ================================================================================================================
+    # 항공권 + 호텔 시작
+    combined_combinations = make_combined_combinations(all_flight_combinations, all_hotel_combinations)
+    combined_combinations = check_budget(budget, combined_combinations)
+    combined_combinations = add_hotel_name_to_combined(combined_combinations)
+    # print_combined_combinations(combined_combinations)
+
+    # ================================================================================================================
+    # 가능한 날짜 조합 확인
+    # print_common_dates(all_flight_combinations, all_hotel_combinations)
+
+    # ================================================================================================================
+    # 템플릿 형식에 맞게 고치기
+    formatted_packages = make_formatted_packages(combined_combinations)
+
+    return render(request, 'recommendation/decision_date_range.html', {
+        'cities': cities_str,
+        'stay_duration': stay_duration,
+        'budget': budget,
+        'packages': formatted_packages
+    })
+
+
+def generate_first_last_date():
+    # Flight에서 가장 최근 departure_date를 가져오기
+    latest_departure_date = Flight.objects.values('departure_date') \
+        .distinct() \
+        .order_by('-departure_date') \
+        .first()
+    # departure_date: 문자열 -> datetime 변환
+    departure_date_str = latest_departure_date['departure_date']
+    departure_date_as_datetime = datetime.strptime(departure_date_str, '%y%m%d').date()  # .date()로 시간 제외
+    # HotelAvailability에서 가장 최근 checkin_date를 가져오기
+    latest_checkin_date = HotelAvailability.objects.values('checkin_date') \
+        .distinct() \
+        .order_by('-checkin_date') \
+        .first()
+    # checkin_date: datetime.date -> datetime 변환
+    checkin_date = latest_checkin_date['checkin_date']
+    checkin_date_as_datetime = checkin_date  # 이미 datetime.date 객체
+    # 더 빠른 날짜 선택
+    last_date = min(departure_date_as_datetime, checkin_date_as_datetime)
+    # 현재 날짜로부터 내일을 구해서 first_date 설정 (시간 제외)
+    today = datetime.now().date()  # .date()로 시간 제외
+    first_date = today + timedelta(days=1)
+    return first_date, last_date
+
+
+def generate_departure_arrival_dates(first_date, last_date, stay_duration):
+    departure_arrival_list = []
+    current_departure_date = first_date
+
+    while current_departure_date <= last_date:
+        # departure_date는 current_departure_date, arrival_date는 current_departure_date + stay_duration
+        arrival_date = current_departure_date + timedelta(days=stay_duration)
+
+        # arrival_date가 last_date를 넘지 않도록 조정
+        if arrival_date > last_date:
+            break
+
+        # departure_date와 arrival_date를 딕셔너리 형태로 추가
+        departure_arrival_list.append({
+            'departure_date': current_departure_date.strftime('%Y-%m-%d'),
+            'arrival_date': arrival_date.strftime('%Y-%m-%d')
+        })
+
+        # 다음 출발 날짜로 하루를 더함
+        current_departure_date += timedelta(days=1)
+
+    return departure_arrival_list
+
 
 def generate_date_range(start_date_str, end_date_str):
     # 문자열을 datetime 객체로 변환
@@ -295,8 +409,9 @@ def make_formatted_packages(combined_combinations):
                 'departure_time': datetime.strptime(combo['flight']['departure_flight']['departure_time'],
                                                     '%y%m%d%H%M').strftime('%I:%M %p'),
                 'arrival_time': datetime.strptime(combo['flight']['departure_flight']['arrival_time'],
-                                                    '%y%m%d%H%M').strftime('%I:%M %p'),
-                'amount': combo['flight']['departure_flight']['amount']
+                                                  '%y%m%d%H%M').strftime('%I:%M %p'),
+                'amount': combo['flight']['departure_flight']['amount'],
+                'carrier': combo['flight']['departure_flight']['carrier_names']
             },
             'return': {
                 'airline': combo['flight']['return_flight']['flight_id'],
@@ -308,18 +423,41 @@ def make_formatted_packages(combined_combinations):
                                                     '%y%m%d%H%M').strftime('%I:%M %p'),
                 'arrival_time': datetime.strptime(combo['flight']['return_flight']['arrival_time'],
                                                   '%y%m%d%H%M').strftime('%I:%M %p'),
-                'price': combo['flight']['return_flight']['amount']
+                'price': combo['flight']['return_flight']['amount'],
+                'carrier': combo['flight']['return_flight']['carrier_names']
             },
             'hotel': {
-                'hotel_name': f"Hotel #{combo['hotel']['hotel_id']}",  # 호텔 이름이 없는 경우 ID로 대체
+                'hotel_name': combo['hotel']['hotel_name'],  # 호텔 이름이 없는 경우 ID로 대체
                 'city': combo['flight']['departure_flight']['arrival'],  # 도착 도시를 호텔 도시로 사용
                 'check_in': combo['hotel']['check_in'],
-                'check_out': combo['hotel']['check_out']
+                'check_out': combo['hotel']['check_out'],
+                'check_in_time': combo['hotel']['checkin_time'],
+                'check_out_time': combo['hotel']['checkout_time']
             },
             'hotel_price': combo['hotel']['total_price']
         }
         formatted_packages.append(formatted_package)
     return formatted_packages
+
+
+# HotelSearch 모델에서 호텔 이름을 가져오는 로직
+def add_hotel_name_to_combined(combined_combinations):
+    for combination in combined_combinations:
+        hotel_id = combination['hotel']['hotel_id']
+
+        # 해당 hotel_id로 첫 번째 호텔을 가져오기
+        hotel = HotelSearch.objects.filter(hotel_id=hotel_id).first()
+
+        if hotel:
+            combination['hotel']['hotel_name'] = hotel.hotel_name  # 호텔 이름 추가
+            combination['hotel']['checkin_time'] = hotel.checkin_time  # 체크인 시간 추가
+            combination['hotel']['checkout_time'] = hotel.checkout_time  # 체크아웃 시간 추가
+        else:
+            combination['hotel']['hotel_name'] = None  # 호텔 이름이 없을 경우 None 설정
+            combination['hotel']['checkin_time'] = None  # 체크인 시간이 없을 경우 None 설정
+            combination['hotel']['checkout_time'] = None  # 체크아웃 시간이 없을 경우 None 설정
+
+    return combined_combinations
 
 
 def check_budget(budget, combined_combinations):
@@ -379,7 +517,8 @@ def make_combined_combinations(all_flight_combinations, all_hotel_combinations):
                             'departure_time': flight_combo['departure_flight'].departure_time,
                             'arrival_time': flight_combo['departure_flight'].arrival_time,
                             'date': flight_combo['departure_flight'].departure_date,
-                            'amount': flight_combo['departure_flight'].amount
+                            'amount': flight_combo['departure_flight'].amount,
+                            'carrier_names': flight_combo['departure_flight'].carrier_names
                         },
                         'return_flight': {
                             'flight_id': flight_combo['return_flight'].flight_id,
@@ -388,7 +527,8 @@ def make_combined_combinations(all_flight_combinations, all_hotel_combinations):
                             'departure_time': flight_combo['return_flight'].departure_time,
                             'arrival_time': flight_combo['return_flight'].arrival_time,
                             'date': flight_combo['return_flight'].departure_date,
-                            'amount': flight_combo['return_flight'].amount
+                            'amount': flight_combo['return_flight'].amount,
+                            'carrier_names': flight_combo['return_flight'].carrier_names
                         }
                     },
                     'hotel': hotel_combo

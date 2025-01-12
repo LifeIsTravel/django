@@ -1,6 +1,7 @@
+<!-- templates/page7.html -->
 {% extends 'base.html' %}
 
-{% block title %}여행 정보{% endblock %}
+{% block title %}Life Is Travel{% endblock %}
 {% load humanize %}
 
 {% block content %}
@@ -14,18 +15,15 @@
         <a href="/" class="text-decoration-none">
             <h1 class="fw-bold text-primary">Life Is Travel</h1>
         </a>
-        <p class="text-center text-muted">
-            여행은 가고 싶은데, 어떻게 할 지 모르겠어. 도와줘!
-        </p>
+        <p class="text-center text-muted">여행은 가고 싶은데, 어떻게 할 지 모르겠어. 도와줘! - “아직 일정을 안 정했어요”일 때</p>
     </div>
 </div>
-
 <!-- 검색 조건 요약 영역 -->
 <div class="container my-4">
     <h2 class="mb-4">여행 정보</h2>
     <div class="row g-3">
         <!-- 예산 -->
-        <div class="col-md-6 col-lg-3">
+        <div class="col-md-4">
             <div class="card border-info">
                 <div class="card-body">
                     <h5 class="card-title">예산</h5>
@@ -35,14 +33,14 @@
                 </div>
             </div>
         </div>
-        <!-- 출발일 (범위) -->
-        <div class="col-md-6 col-lg-3">
+        <!-- 숙박일수 -->
+        <div class="col-md-4">
             <div class="card border-primary">
                 <div class="card-body">
-                    <h5 class="card-title">출발일(범위)</h5>
+                    <h5 class="card-title">숙박일수</h5>
                     <p class="card-text">
-                        {% if departure_start and departure_end %}
-                        {{ departure_start }} ~ {{ departure_end }}
+                        {% if stay_duration %}
+                        {{ stay_duration }}일
                         {% else %}
                         -
                         {% endif %}
@@ -50,31 +48,16 @@
                 </div>
             </div>
         </div>
-        <!-- 도착일 (범위) -->
-        <div class="col-md-6 col-lg-3">
+        <!-- 여행지 -->
+        <div class="col-md-4">
             <div class="card border-warning">
-                <div class="card-body">
-                    <h5 class="card-title">도착일(범위)</h5>
-                    <p class="card-text">
-                        {% if arrival_start and arrival_end %}
-                        {{ arrival_start }} ~ {{ arrival_end }}
-                        {% else %}
-                        -
-                        {% endif %}
-                    </p>
-                </div>
-            </div>
-        </div>
-        <!-- 여행지(도시들) -->
-        <div class="col-md-6 col-lg-3">
-            <div class="card border-success">
                 <div class="card-body">
                     <h5 class="card-title">여행지</h5>
                     <p class="card-text">
                         {% if cities %}
-                        {{ cities|join:", " }}
+                        {{ cities }}
                         {% else %}
-                        미정
+                        선택하신 여행지가 없습니다.
                         {% endif %}
                     </p>
                 </div>
@@ -82,7 +65,6 @@
         </div>
     </div>
 </div>
-
 <!-- 비행기+호텔 조합 리스트 -->
 <div class="container mb-5">
     <h2 class="mb-3">추천 조합</h2>
