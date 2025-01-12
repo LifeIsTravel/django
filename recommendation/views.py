@@ -47,32 +47,31 @@ def decision_all(request):
     # ================================================================================================================
     # 날짜 조합 만들기
     all_combinations = make_all_combinations(arrival_dates, departure_dates)
-    print("all_combinations_length", len(all_combinations))
-    print(all_combinations)
+    # print("all_combinations_length", len(all_combinations))
+    # print(all_combinations)
 
     # ================================================================================================================
     # 항공권 시작
     print(cities_list)
     all_flight_combinations = make_all_flight_combinations(all_combinations, cities_list)
-    # all_flight_combinations = extract_city_from_flight(all_flight_combinations, cities_list)
     all_flight_combinations = filter_same_airports(all_flight_combinations)
-    print_flight_combinations(all_flight_combinations)
+    # print_flight_combinations(all_flight_combinations)
 
     # ================================================================================================================
     # 호텔 시작
     all_hotel_combinations = make_all_hotel_combinations(all_combinations)
     all_hotel_combinations = extract_city_from_hotel(all_hotel_combinations, cities_list)
-    print_hotel_combinations(all_hotel_combinations)
+    # print_hotel_combinations(all_hotel_combinations)
 
     # ================================================================================================================
     # 항공권 + 호텔 시작
     combined_combinations = make_combined_combinations(all_flight_combinations, all_hotel_combinations)
     combined_combinations = check_budget(budget, combined_combinations)
-    print_combined_combinations(combined_combinations)
+    # print_combined_combinations(combined_combinations)
 
     # ================================================================================================================
     # 가능한 날짜 조합 확인
-    print_common_dates(all_flight_combinations, all_hotel_combinations)
+    # print_common_dates(all_flight_combinations, all_hotel_combinations)
 
     # ================================================================================================================
     # 템플릿 형식에 맞게 고치기
@@ -122,31 +121,30 @@ def flight_decision_date(request):
     # ================================================================================================================
     # 날짜 조합 만들기
     all_combinations = make_all_combinations(arrival_dates, departure_dates)
-    print("all_combinations_length", len(all_combinations))
-    print(all_combinations)
+    # print("all_combinations_length", len(all_combinations))
+    # print(all_combinations)
 
     # ================================================================================================================
     # 항공권 시작
     all_flight_combinations = make_all_flight_combinations(all_combinations, ['NRT', 'KIX', 'FUK', 'CTS'])
-    # all_flight_combinations = extract_city_from_flight(all_flight_combinations, cities_list)
     all_flight_combinations = filter_same_airports(all_flight_combinations)
-    print_flight_combinations(all_flight_combinations)
+    # print_flight_combinations(all_flight_combinations)
 
     # ================================================================================================================
     # 호텔 시작
     all_hotel_combinations = make_all_hotel_combinations(all_combinations)
     all_hotel_combinations = extract_city_from_hotel(all_hotel_combinations, ['NRT', 'KIX', 'FUK', 'CTS'])
-    print_hotel_combinations(all_hotel_combinations)
+    # print_hotel_combinations(all_hotel_combinations)
 
     # ================================================================================================================
     # 항공권 + 호텔 시작
     combined_combinations = make_combined_combinations(all_flight_combinations, all_hotel_combinations)
     combined_combinations = check_budget(budget, combined_combinations)
-    print_combined_combinations(combined_combinations)
+    # print_combined_combinations(combined_combinations)
 
     # ================================================================================================================
     # 가능한 날짜 조합 확인
-    print_common_dates(all_flight_combinations, all_hotel_combinations)
+    # print_common_dates(all_flight_combinations, all_hotel_combinations)
 
     # ================================================================================================================
     # 템플릿 형식에 맞게 고치기
@@ -294,6 +292,10 @@ def make_formatted_packages(combined_combinations):
                 'arrival_display_code': combo['flight']['departure_flight']['arrival'],
                 'departure_date': datetime.strptime(combo['flight']['departure_flight']['date'], '%y%m%d').strftime(
                     '%Y-%m-%d'),
+                'departure_time': datetime.strptime(combo['flight']['departure_flight']['departure_time'],
+                                                    '%y%m%d%H%M').strftime('%I:%M %p'),
+                'arrival_time': datetime.strptime(combo['flight']['departure_flight']['arrival_time'],
+                                                    '%y%m%d%H%M').strftime('%I:%M %p'),
                 'amount': combo['flight']['departure_flight']['amount']
             },
             'return': {
@@ -302,6 +304,10 @@ def make_formatted_packages(combined_combinations):
                 'arrival_display_code': combo['flight']['return_flight']['arrival'],
                 'departure_date': datetime.strptime(combo['flight']['return_flight']['date'], '%y%m%d').strftime(
                     '%Y-%m-%d'),
+                'departure_time': datetime.strptime(combo['flight']['return_flight']['departure_time'],
+                                                    '%y%m%d%H%M').strftime('%I:%M %p'),
+                'arrival_time': datetime.strptime(combo['flight']['return_flight']['arrival_time'],
+                                                  '%y%m%d%H%M').strftime('%I:%M %p'),
                 'price': combo['flight']['return_flight']['amount']
             },
             'hotel': {
@@ -370,6 +376,8 @@ def make_combined_combinations(all_flight_combinations, all_hotel_combinations):
                             'flight_id': flight_combo['departure_flight'].flight_id,
                             'departure': flight_combo['departure_flight'].departure_display_code,
                             'arrival': flight_combo['departure_flight'].arrival_display_code,
+                            'departure_time': flight_combo['departure_flight'].departure_time,
+                            'arrival_time': flight_combo['departure_flight'].arrival_time,
                             'date': flight_combo['departure_flight'].departure_date,
                             'amount': flight_combo['departure_flight'].amount
                         },
@@ -377,6 +385,8 @@ def make_combined_combinations(all_flight_combinations, all_hotel_combinations):
                             'flight_id': flight_combo['return_flight'].flight_id,
                             'departure': flight_combo['return_flight'].departure_display_code,
                             'arrival': flight_combo['return_flight'].arrival_display_code,
+                            'departure_time': flight_combo['return_flight'].departure_time,
+                            'arrival_time': flight_combo['return_flight'].arrival_time,
                             'date': flight_combo['return_flight'].departure_date,
                             'amount': flight_combo['return_flight'].amount
                         }

@@ -84,10 +84,10 @@
                     </h5>
                     <ul class="list-group list-group-flush mb-3">
                         <li class="list-group-item">
-                            <strong>출발일:</strong> {{ item.departure.departure_date }}
+                            <strong>출발일:</strong> {{ item.departure.departure_date }} | {{item.departure.departure_time}} ~ {{item.departure.arrival_time}}
                         </li>
                         <li class="list-group-item">
-                            <strong>복귀일:</strong> {{ item.return.departure_date }}
+                            <strong>복귀일:</strong> {{ item.return.departure_date }} | {{item.return.departure_time}} ~ {{item.return.arrival_time}}
                         </li>
                         <li class="list-group-item">
                             <strong>항공권 가격:</strong> {{ item.departure.amount|floatformat:0|intcomma }} + {{ item.return.price|floatformat:0|intcomma }} 원
