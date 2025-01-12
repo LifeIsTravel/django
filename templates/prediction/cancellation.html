@@ -53,8 +53,13 @@
         <div class="alert alert-info" id="result-message">
             <!-- 지연 확률 및 멘트가 여기에 출력됩니다 -->
         </div>
+         <!-- 도착지의 날씨 정보 섹션 -->
         <div class="card bg-light p-4 mt-3">
             <h5 class="text-secondary">도착지의 날씨 정보</h5>
+            <button id="weather-button" class="btn btn-info w-100 mt-2">도착지 날씨 정보 확인</button>
+
+            <!-- 날씨 정보가 표시될 영역 -->
+            <div id="weather-info" class="mt-3"></div>
         </div>
     </div>
 </div>
@@ -62,18 +67,90 @@
 
 {% block extra_js %}
 <script>
+    // 공항 코드별 위도, 경도 매핑
+    const airportCoords = {
+        "ICN": { lat: 37.4602, lon: 126.4407 },  // 인천
+        "CTS": { lat: 42.7752, lon: 141.6923 },  // 신치토세
+        "NRT": { lat: 35.7720, lon: 140.3929 },  // 나리타
+        "KIX": { lat: 34.4342, lon: 135.2440 },  // 간사이
+        "FUK": { lat: 33.5859, lon: 130.4507 }   // 후쿠오카
+    };
+
+    // 유효한 공항 코드 리스트
+    const validAirports = Object.keys(airportCoords);
+
+    // OpenWeather API 키
+    const apiKey = "d58c07bb7016f7eb86be1861b09d804d";
+
+    // 항공편 검색 폼 제출 처리
     function handleSubmit(event) {
         event.preventDefault();  // 폼 제출 기본 동작 방지
-        document.getElementById("form-container").classList.add("mb-4"); // 폼 아래 여백 추가
-        document.getElementById("result-container").classList.remove("d-none"); // 결과 보여주기
 
-        // 지연 확률을 무작위로 설정 (예: 0% ~ 100%)
-        const probability = Math.floor(Math.random() * 101);
-        const message = getMessage(probability);
+        // 입력값 가져오기
+        const date = document.getElementById("departure-date").value;
+        const airline = document.getElementById("airline").value;
+        const departureAirport = document.getElementById("departure-airport").value.toUpperCase();
+        const arrivalAirport = document.getElementById("arrival-airport").value.toUpperCase();
+        const scheduledTime = document.getElementById("departure-time").value;
 
-        document.getElementById("result-message").innerHTML = `오늘 항공편이 지연될 확률은 <strong>${probability}%</strong> 입니다.<br>${message}`;
+        // 출발/도착 공항 유효성 검사
+        if (!validAirports.includes(departureAirport) || !validAirports.includes(arrivalAirport)) {
+            alert("지원하는 공항은 ICN, CTS, NRT, KIX, FUK 입니다.");
+            return;
+        }
+
+        // 날짜 제한 검사 (+16일)
+        const selectedDate = new Date(date);
+        const today = new Date();
+        const maxDate = new Date();
+        maxDate.setDate(today.getDate() + 16);
+
+        if (selectedDate > maxDate) {
+            alert("항공편 검색은 출발일 기준 최대 16일까지만 가능합니다.");
+            return;
+        }
+
+        // API 요청 데이터 구성
+        const requestData = {
+            date: date,
+            scheduled_time: scheduledTime,
+            departure_airport: departureAirport,
+            arrival_airport: arrivalAirport,
+            airline: airline
+        };
+
+        // 항공편 지연 예측 API 호출
+        fetch("http://43.202.202.181:8000/predict/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(requestData)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            const probability = data.probability;
+            const message = getMessage(probability);
+
+            document.getElementById("form-container").classList.add("mb-4");
+            document.getElementById("result-container").classList.remove("d-none");
+            document.getElementById("result-message").innerHTML =
+                `오늘 항공편이 지연될 확률은 <strong>${probability}%</strong> 입니다.<br>${message}`;
+        })
+        .catch(error => {
+            console.error("API 호출 오류:", error);
+            document.getElementById("result-message").innerHTML =
+                `<span class="text-danger">예측 결과를 불러오는 데 실패했습니다. 다시 시도해 주세요.</span>`;
+            document.getElementById("result-container").classList.remove("d-none");
+        });
     }
 
+    // 확률에 따른 메시지 반환
     function getMessage(probability) {
         if (probability < 20) {
             return "안전한 여행 되세요!";
@@ -83,5 +160,83 @@
             return "지연될 가능성이 높습니다. 다른 준비를 고려하세요.";
         }
     }
+
+    // 날씨 정보 조회 함수
+    function fetchWeatherInfo(airportCode, date, time) {
+        const coords = airportCoords[airportCode.toUpperCase()];
+        if (!coords) {
+            alert("지원하지 않는 공항입니다.");
+            return;
+        }
+
+        const timestamp = Math.floor(new Date(`${date}T${time}`).getTime() / 1000);
+        const url = `https://api.openweathermap.org/data/3.0/onecall/timemachine?lat=${coords.lat}&lon=${coords.lon}&dt=${timestamp}&appid=${apiKey}&units=metric`;
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("날씨 정보를 불러오는 데 실패했습니다.");
+                }
+                return response.json();
+            })
+            .then(data => {
+                displayWeatherInfo(data);
+            })
+            .catch(error => {
+                console.error("날씨 정보 오류:", error);
+                document.getElementById("weather-info").innerHTML =
+                    `<span class="text-danger">날씨 정보를 불러오는 데 실패했습니다.</span>`;
+            });
+    }
+
+    // 날씨 정보 렌더링 함수
+    function displayWeatherInfo(data) {
+        const weather = data.data[0].weather[0];
+        const temp = data.data[0].temp;
+        const humidity = data.data[0].humidity;
+        const windSpeed = data.data[0].wind_speed;
+
+        const weatherHTML = `
+            <div class="card shadow-lg p-4 border-0" style="background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%); color: white;">
+                <div class="d-flex align-items-center">
+                    <img src="https://openweathermap.org/img/wn/${weather.icon}@2x.png" alt="날씨 아이콘" class="me-3">
+                    <div>
+                        <h4 class="fw-bold mb-1">${weather.main}</h4>
+                        <p class="mb-0">${weather.description}</p>
+                    </div>
+                </div>
+                <hr class="my-3" style="border-color: rgba(255, 255, 255, 0.5);">
+                <div class="d-flex justify-content-around">
+                    <div>
+                        <h5>🌡️ 기온</h5>
+                        <p class="fw-bold mb-0">${temp} °C</p>
+                    </div>
+                    <div>
+                        <h5>💧 습도</h5>
+                        <p class="fw-bold mb-0">${humidity}%</p>
+                    </div>
+                    <div>
+                        <h5>🌬️ 풍속</h5>
+                        <p class="fw-bold mb-0">${windSpeed} m/s</p>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.getElementById("weather-info").innerHTML = weatherHTML;
+    }
+
+    // 날씨 버튼 클릭 이벤트
+    document.getElementById("weather-button").addEventListener("click", function () {
+        const date = document.getElementById("departure-date").value;
+        const time = document.getElementById("departure-time").value;
+        const arrivalAirport = document.getElementById("arrival-airport").value.toUpperCase();
+
+        if (date && time && arrivalAirport) {
+            fetchWeatherInfo(arrivalAirport, date, time);
+        } else {
+            alert("출발일자, 시간, 도착공항을 모두 입력해 주세요.");
+        }
+    });
 </script>
 {% endblock %}
