@@ -2,6 +2,7 @@
 {% extends 'base.html' %}
 
 {% block title %}Life Is Travel{% endblock %}
+{% load humanize %}
 
 {% block content %}
 <!-- Header -->
@@ -17,62 +18,104 @@
         <p class="text-center text-muted">여행은 가고 싶은데, 어떻게 할 지 모르겠어. 도와줘! - “아직 여행지를 안 정했어요”일 때</p>
     </div>
 </div>
-<div class="container">
-    <div class="row">
-        <!-- 여행 정보 -->
-        <div class="col-12 mt-4" id="travel-info">
-            <!-- 출발일, 도착일, 예산을 카드 형태로 표시 -->
-            <div class="row">
-
-                <div class="col-md-4 mb-3">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">예산</h5>
-                            <p class="card-text" id="budget"></p>
-                        </div>
-                    </div>
+<!-- 검색 조건 요약 영역 -->
+<div class="container my-4">
+    <h2 class="mb-4">여행 정보</h2>
+    <div class="row g-3">
+        <!-- 예산 -->
+        <div class="col-md-4">
+            <div class="card border-info">
+                <div class="card-body">
+                    <h5 class="card-title">예산</h5>
+                    <p class="card-text">
+                        {{ budget|intcomma }} 원
+                    </p>
                 </div>
-
-                <div class="col-md-4 mb-3">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">출발일(범위)</h5>
-                            <p class="card-text" id="departure"></p>
-                        </div>
-                    </div>
+            </div>
+        </div>
+        <!-- 출발일 (범위) -->
+        <div class="col-md-4">
+            <div class="card border-primary">
+                <div class="card-body">
+                    <h5 class="card-title">출발일(범위)</h5>
+                    <p class="card-text">
+                        {% if departure_start and departure_end %}
+                            {{ departure_start }} ~ {{ departure_end }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </p>
                 </div>
-
-                <div class="col-md-4 mb-3">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">도착일(범위)</h5>
-                            <p class="card-text" id="arrival"></p>
-                        </div>
-                    </div>
+            </div>
+        </div>
+        <!-- 도착일 (범위) -->
+        <div class="col-md-4">
+            <div class="card border-warning">
+                <div class="card-body">
+                    <h5 class="card-title">도착일(범위)</h5>
+                    <p class="card-text">
+                        {% if arrival_start and arrival_end %}
+                            {{ arrival_start }} ~ {{ arrival_end }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </p>
                 </div>
-
             </div>
         </div>
     </div>
 </div>
+<!-- 비행기+호텔 조합 리스트 -->
+<div class="container mb-5">
+    <h2 class="mb-3">추천 조합</h2>
 
-<script>
-    // URL에서 파라미터를 추출하는 함수
-    function getUrlParams() {
-        const params = new URLSearchParams(window.location.search);
-        return {
-            departure: params.get('departure'),     // 출발일(범위)
-            arrival: params.get('arrival'),         // 도착일(범위)
-            budget: params.get('budget'),           // 예산
-        };
-    }
+    {% if packages and packages|length > 0 %}
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+        {% for item in packages %}
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    총 비용: {{ item.total_price|floatformat:0|intcomma }} 원
+                </div>
+                <div class="card-body">
+                    <!-- 비행기 정보 -->
+                    <h5 class="card-title text-primary mb-2">
+                        ✈ 항공 : {{ item.departure.airline }} {{ item.return.airline }} ({{ item.departure.departure_display_code }} → {{ item.departure.arrival_display_code }})
+                    </h5>
+                    <ul class="list-group list-group-flush mb-3">
+                        <li class="list-group-item">
+                            <strong>출발일:</strong> {{ item.departure.departure_date }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>복귀일:</strong> {{ item.return.departure_date }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>항공권 가격:</strong> {{ item.departure.amount|floatformat:0|intcomma }} + {{ item.return.price|floatformat:0|intcomma }} 원
+                        </li>
+                    </ul>
 
-    // 페이지 로드 시 파라미터를 추출하여 변수에 저장
-    const params = getUrlParams();
-
-    // 여행 정보 표시
-    document.getElementById("departure").innerText = params.departure;
-    document.getElementById("arrival").innerText = params.arrival;
-    document.getElementById("budget").innerText = `${params.budget} 원`;
-</script>
+                    <!-- 호텔 정보 -->
+                    <h5 class="card-title text-success mb-2">
+                        🏨 호텔 : {{ item.hotel.hotel_name }} ({{ item.hotel.city }})
+                    </h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <strong>체크인:</strong> {{ item.hotel.check_in }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>체크아웃:</strong> {{ item.hotel.check_out }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>숙박 가격:</strong> {{ item.hotel_price|floatformat:0|intcomma }} 원
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted">현재 조건에 맞는 조합이 없습니다.</p>
+    {% endif %}
+</div>
 {% endblock %}
