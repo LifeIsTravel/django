@@ -42,9 +42,9 @@
                     <h5 class="card-title">출발일(범위)</h5>
                     <p class="card-text">
                         {% if departure_start and departure_end %}
-                            {{ departure_start }} ~ {{ departure_end }}
+                        {{ departure_start }} ~ {{ departure_end }}
                         {% else %}
-                            -
+                        -
                         {% endif %}
                     </p>
                 </div>
@@ -57,9 +57,9 @@
                     <h5 class="card-title">도착일(범위)</h5>
                     <p class="card-text">
                         {% if arrival_start and arrival_end %}
-                            {{ arrival_start }} ~ {{ arrival_end }}
+                        {{ arrival_start }} ~ {{ arrival_end }}
                         {% else %}
-                            -
+                        -
                         {% endif %}
                     </p>
                 </div>
@@ -72,9 +72,9 @@
                     <h5 class="card-title">여행지</h5>
                     <p class="card-text">
                         {% if cities %}
-                            {{ cities|join:", " }}
+                        {{ cities|join:", " }}
                         {% else %}
-                            미정
+                        미정
                         {% endif %}
                     </p>
                 </div>
@@ -88,52 +88,52 @@
     <h2 class="mb-3">추천 조합</h2>
 
     {% if packages and packages|length > 0 %}
-        <div class="row row-cols-1 row-cols-md-2 g-4">
-            {% for item in packages %}
-                <div class="col">
-                    <div class="card h-100 shadow-sm">
-                        <div class="card-header bg-primary text-white">
-                            총 비용: {{ item.total_price|floatformat:0|intcomma }} 원
-                        </div>
-                        <div class="card-body">
-                            <!-- 비행기 정보 -->
-                            <h5 class="card-title text-primary mb-2">
-                                ✈ 항공 : {{ item.departure.airline }} ({{ item.departure.departure_display_code }} → {{ item.departure.arrival_display_code }})
-                            </h5>
-                            <ul class="list-group list-group-flush mb-3">
-                                <li class="list-group-item">
-                                    <strong>출발일:</strong> {{ item.departure.departure_date }}
-                                </li>
-                                <li class="list-group-item">
-                                    <strong>복귀일:</strong> {{ item.return.departure_date }}
-                                </li>
-                                <li class="list-group-item">
-                                    <strong>항공권 가격:</strong> {{ item.departure.amount|floatformat:0|intcomma }} + {{ item.return.price|floatformat:0|intcomma }} 원
-                                </li>
-                            </ul>
-
-                            <!-- 호텔 정보 -->
-                            <h5 class="card-title text-success mb-2">
-                                🏨 호텔 : {{ item.hotel.hotel_name }} ({{ item.hotel.city }})
-                            </h5>
-                            <ul class="list-group list-group-flush">
-                                <li class="list-group-item">
-                                    <strong>체크인:</strong> {{ item.hotel.check_in }}
-                                </li>
-                                <li class="list-group-item">
-                                    <strong>체크아웃:</strong> {{ item.hotel.check_out }}
-                                </li>
-                                <li class="list-group-item">
-                                    <strong>숙박 가격:</strong> {{ item.hotel_price|floatformat:0|intcomma }} 원
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+        {% for item in packages %}
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    총 비용: {{ item.total_price|floatformat:0|intcomma }} 원
                 </div>
-            {% endfor %}
+                <div class="card-body">
+                    <!-- 비행기 정보 -->
+                    <h5 class="card-title text-primary mb-2">
+                        ✈ 항공 : {{ item.departure.airline }} {{ item.return.airline }} ({{ item.departure.departure_display_code }} → {{ item.departure.arrival_display_code }})
+                    </h5>
+                    <ul class="list-group list-group-flush mb-3">
+                        <li class="list-group-item">
+                            <strong>출발일:</strong> {{ item.departure.departure_date }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>복귀일:</strong> {{ item.return.departure_date }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>항공권 가격:</strong> {{ item.departure.amount|floatformat:0|intcomma }} + {{ item.return.price|floatformat:0|intcomma }} 원
+                        </li>
+                    </ul>
+
+                    <!-- 호텔 정보 -->
+                    <h5 class="card-title text-success mb-2">
+                        🏨 호텔 : {{ item.hotel.hotel_name }} ({{ item.hotel.city }})
+                    </h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <strong>체크인:</strong> {{ item.hotel.check_in }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>체크아웃:</strong> {{ item.hotel.check_out }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>숙박 가격:</strong> {{ item.hotel_price|floatformat:0|intcomma }} 원
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
+        {% endfor %}
+    </div>
     {% else %}
-        <p class="text-muted">현재 조건에 맞는 조합이 없습니다.</p>
+    <p class="text-muted">현재 조건에 맞는 조합이 없습니다.</p>
     {% endif %}
 </div>
 {% endblock %}
