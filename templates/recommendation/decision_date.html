@@ -80,14 +80,16 @@
                 <div class="card-body">
                     <!-- 비행기 정보 -->
                     <h5 class="card-title text-primary mb-2">
-                        ✈ 항공 : {{ item.departure.airline }} {{ item.return.airline }} ({{ item.departure.departure_display_code }} → {{ item.departure.arrival_display_code }})
+                        ✈ 항공 : {{ item.departure.departure_display_code }} ({{ item.departure.carrier }}) → {{ item.departure.arrival_display_code }} ({{ item.return.carrier }})
                     </h5>
                     <ul class="list-group list-group-flush mb-3">
                         <li class="list-group-item">
-                            <strong>출발일:</strong> {{ item.departure.departure_date }} | {{item.departure.departure_time}} ~ {{item.departure.arrival_time}}
+                            <strong>출발일:</strong> {{ item.departure.departure_date }} |
+                            {{item.departure.departure_time}} ~ {{item.departure.arrival_time}}
                         </li>
                         <li class="list-group-item">
-                            <strong>복귀일:</strong> {{ item.return.departure_date }} | {{item.return.departure_time}} ~ {{item.return.arrival_time}}
+                            <strong>복귀일:</strong> {{ item.return.departure_date }} | {{item.return.departure_time}} ~
+                            {{item.return.arrival_time}}
                         </li>
                         <li class="list-group-item">
                             <strong>항공권 가격:</strong> {{ item.departure.amount|floatformat:0|intcomma }} + {{ item.return.price|floatformat:0|intcomma }} 원
@@ -96,14 +98,14 @@
 
                     <!-- 호텔 정보 -->
                     <h5 class="card-title text-success mb-2">
-                        🏨 호텔 : {{ item.hotel.hotel_name }} ({{ item.hotel.city }})
+                        🏨 호텔 : {{ item.hotel.city }} ({{ item.hotel.hotel_name }})
                     </h5>
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item">
-                            <strong>체크인:</strong> {{ item.hotel.check_in }}
+                            <strong>체크인:</strong> {{ item.hotel.check_in }} | {{ item.hotel.check_in_time }}
                         </li>
                         <li class="list-group-item">
-                            <strong>체크아웃:</strong> {{ item.hotel.check_out }}
+                            <strong>체크아웃:</strong> {{ item.hotel.check_out }}  | {{ item.hotel.check_out_time }}
                         </li>
                         <li class="list-group-item">
                             <strong>숙박 가격:</strong> {{ item.hotel_price|floatformat:0|intcomma }} 원

@@ -67,6 +67,8 @@ def decision_all(request):
     # 항공권 + 호텔 시작
     combined_combinations = make_combined_combinations(all_flight_combinations, all_hotel_combinations)
     combined_combinations = check_budget(budget, combined_combinations)
+    combined_combinations = add_hotel_name_to_combined(combined_combinations)
+    print(combined_combinations[0])
     # print_combined_combinations(combined_combinations)
 
     # ================================================================================================================
@@ -140,6 +142,7 @@ def flight_decision_date(request):
     # 항공권 + 호텔 시작
     combined_combinations = make_combined_combinations(all_flight_combinations, all_hotel_combinations)
     combined_combinations = check_budget(budget, combined_combinations)
+    combined_combinations = add_hotel_name_to_combined(combined_combinations)
     # print_combined_combinations(combined_combinations)
 
     # ================================================================================================================
@@ -206,6 +209,7 @@ def flight_decision_date_range(request):
     # 항공권 + 호텔 시작
     combined_combinations = make_combined_combinations(all_flight_combinations, all_hotel_combinations)
     combined_combinations = check_budget(budget, combined_combinations)
+    combined_combinations = add_hotel_name_to_combined(combined_combinations)
     # print_combined_combinations(combined_combinations)
 
     # ================================================================================================================
@@ -406,7 +410,8 @@ def make_formatted_packages(combined_combinations):
                                                     '%y%m%d%H%M').strftime('%I:%M %p'),
                 'arrival_time': datetime.strptime(combo['flight']['departure_flight']['arrival_time'],
                                                   '%y%m%d%H%M').strftime('%I:%M %p'),
-                'amount': combo['flight']['departure_flight']['amount']
+                'amount': combo['flight']['departure_flight']['amount'],
+                'carrier': combo['flight']['departure_flight']['carrier_names']
             },
             'return': {
                 'airline': combo['flight']['return_flight']['flight_id'],
@@ -418,18 +423,41 @@ def make_formatted_packages(combined_combinations):
                                                     '%y%m%d%H%M').strftime('%I:%M %p'),
                 'arrival_time': datetime.strptime(combo['flight']['return_flight']['arrival_time'],
                                                   '%y%m%d%H%M').strftime('%I:%M %p'),
-                'price': combo['flight']['return_flight']['amount']
+                'price': combo['flight']['return_flight']['amount'],
+                'carrier': combo['flight']['return_flight']['carrier_names']
             },
             'hotel': {
-                'hotel_name': f"Hotel #{combo['hotel']['hotel_id']}",  # 호텔 이름이 없는 경우 ID로 대체
+                'hotel_name': combo['hotel']['hotel_name'],  # 호텔 이름이 없는 경우 ID로 대체
                 'city': combo['flight']['departure_flight']['arrival'],  # 도착 도시를 호텔 도시로 사용
                 'check_in': combo['hotel']['check_in'],
-                'check_out': combo['hotel']['check_out']
+                'check_out': combo['hotel']['check_out'],
+                'check_in_time': combo['hotel']['checkin_time'],
+                'check_out_time': combo['hotel']['checkout_time']
             },
             'hotel_price': combo['hotel']['total_price']
         }
         formatted_packages.append(formatted_package)
     return formatted_packages
+
+
+# HotelSearch 모델에서 호텔 이름을 가져오는 로직
+def add_hotel_name_to_combined(combined_combinations):
+    for combination in combined_combinations:
+        hotel_id = combination['hotel']['hotel_id']
+
+        # 해당 hotel_id로 첫 번째 호텔을 가져오기
+        hotel = HotelSearch.objects.filter(hotel_id=hotel_id).first()
+
+        if hotel:
+            combination['hotel']['hotel_name'] = hotel.hotel_name  # 호텔 이름 추가
+            combination['hotel']['checkin_time'] = hotel.checkin_time  # 체크인 시간 추가
+            combination['hotel']['checkout_time'] = hotel.checkout_time  # 체크아웃 시간 추가
+        else:
+            combination['hotel']['hotel_name'] = None  # 호텔 이름이 없을 경우 None 설정
+            combination['hotel']['checkin_time'] = None  # 체크인 시간이 없을 경우 None 설정
+            combination['hotel']['checkout_time'] = None  # 체크아웃 시간이 없을 경우 None 설정
+
+    return combined_combinations
 
 
 def check_budget(budget, combined_combinations):
@@ -489,7 +517,8 @@ def make_combined_combinations(all_flight_combinations, all_hotel_combinations):
                             'departure_time': flight_combo['departure_flight'].departure_time,
                             'arrival_time': flight_combo['departure_flight'].arrival_time,
                             'date': flight_combo['departure_flight'].departure_date,
-                            'amount': flight_combo['departure_flight'].amount
+                            'amount': flight_combo['departure_flight'].amount,
+                            'carrier_names': flight_combo['departure_flight'].carrier_names
                         },
                         'return_flight': {
                             'flight_id': flight_combo['return_flight'].flight_id,
@@ -498,7 +527,8 @@ def make_combined_combinations(all_flight_combinations, all_hotel_combinations):
                             'departure_time': flight_combo['return_flight'].departure_time,
                             'arrival_time': flight_combo['return_flight'].arrival_time,
                             'date': flight_combo['return_flight'].departure_date,
-                            'amount': flight_combo['return_flight'].amount
+                            'amount': flight_combo['return_flight'].amount,
+                            'carrier_names': flight_combo['return_flight'].carrier_names
                         }
                     },
                     'hotel': hotel_combo
