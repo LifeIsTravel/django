@@ -68,7 +68,6 @@ def decision_all(request):
     combined_combinations = make_combined_combinations(all_flight_combinations, all_hotel_combinations)
     combined_combinations = check_budget(budget, combined_combinations)
     combined_combinations = add_hotel_name_to_combined(combined_combinations)
-    print(combined_combinations[0])
     # print_combined_combinations(combined_combinations)
 
     # ================================================================================================================

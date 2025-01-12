@@ -21,8 +21,6 @@
         <div class="btn-group">
             <a href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort=amount"
                class="btn btn-outline-primary {% if sort_by == 'amount' %}active{% endif %}">가격순</a>
-            <a href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort=airline"
-               class="btn btn-outline-primary {% if sort_by == 'airline' %}active{% endif %}">항공사 이름순</a>
         </div>
     </div>
     <div>
