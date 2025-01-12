@@ -246,14 +246,14 @@
             $('#stay-duration-section').show();
         }
     }
-    
+
     function formatBudget(input) {
         // 숫자만 남기기
         let value = input.value.replace(/,/g, '');
-        
+
         // 숫자로 변환 후, 3자리마다 쉼표 추가
         let formattedValue = Number(value).toLocaleString('en-US');
-        
+
         // 입력 필드에 포맷된 값 적용
         input.value = formattedValue;
     }
@@ -358,7 +358,7 @@
 
                 if (destinationChecked) {
                     // 여행지를 안 정했음 => /recommendation/decision_date
-                    const url = `/recommendation/decision_date?stayDuration=${encodeURIComponent(stayDuration)}&budget=${encodeURIComponent(budget)}`;
+                    const url = `/recommendation/decision_date_range?stayDuration=${encodeURIComponent(stayDuration)}&budget=${encodeURIComponent(budget)}`;
                     window.location.href = url;
                 } else {
                     // 도시 선택 => /recommendation/decision_all
@@ -367,7 +367,7 @@
                         return;
                     }
                     const citiesParam = encodeURIComponent(selectedCities.join(','));
-                    const url = `/recommendation/decision_all?cities=${citiesParam}&stayDuration=${encodeURIComponent(stayDuration)}&budget=${encodeURIComponent(budget)}`;
+                    const url = `/recommendation/decision_date_range?cities=${citiesParam}&stayDuration=${encodeURIComponent(stayDuration)}&budget=${encodeURIComponent(budget)}`;
                     window.location.href = url;
                 }
             }

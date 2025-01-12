@@ -1,0 +1,121 @@
+<!-- templates/page7.html -->
+{% extends 'base.html' %}
+
+{% block title %}Life Is Travel{% endblock %}
+{% load humanize %}
+
+{% block content %}
+<!-- Header -->
+<div class="header text-center py-3 position-relative" style="background-color: #f0f0f0;">
+    <!-- 이전 페이지 버튼을 왼쪽에 고정 -->
+    <a href="/" class="btn btn-secondary position-absolute"
+       style="left: 3%; top: 50%; transform: translateY(-50%);">메인 페이지</a>
+    <!-- 중앙 정렬된 제목과 설명 -->
+    <div class="d-flex flex-column align-items-center justify-content-center">
+        <a href="/" class="text-decoration-none">
+            <h1 class="fw-bold text-primary">Life Is Travel</h1>
+        </a>
+        <p class="text-center text-muted">여행은 가고 싶은데, 어떻게 할 지 모르겠어. 도와줘! - “아직 일정을 안 정했어요”일 때</p>
+    </div>
+</div>
+<!-- 검색 조건 요약 영역 -->
+<div class="container my-4">
+    <h2 class="mb-4">여행 정보</h2>
+    <div class="row g-3">
+        <!-- 예산 -->
+        <div class="col-md-4">
+            <div class="card border-info">
+                <div class="card-body">
+                    <h5 class="card-title">예산</h5>
+                    <p class="card-text">
+                        {{ budget|intcomma }} 원
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- 숙박일수 -->
+        <div class="col-md-4">
+            <div class="card border-primary">
+                <div class="card-body">
+                    <h5 class="card-title">숙박일수</h5>
+                    <p class="card-text">
+                        {% if stay_duration %}
+                        {{ stay_duration }}일
+                        {% else %}
+                        -
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- 여행지 -->
+        <div class="col-md-4">
+            <div class="card border-warning">
+                <div class="card-body">
+                    <h5 class="card-title">여행지</h5>
+                    <p class="card-text">
+                        {% if cities %}
+                        {{ cities }}
+                        {% else %}
+                        선택하신 여행지가 없습니다.
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 비행기+호텔 조합 리스트 -->
+<div class="container mb-5">
+    <h2 class="mb-3">추천 조합</h2>
+
+    {% if packages and packages|length > 0 %}
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+        {% for item in packages %}
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    총 비용: {{ item.total_price|floatformat:0|intcomma }} 원
+                </div>
+                <div class="card-body">
+                    <!-- 비행기 정보 -->
+                    <h5 class="card-title text-primary mb-2">
+                        ✈ 항공 : {{ item.departure.airline }} {{ item.return.airline }} ({{ item.departure.departure_display_code }} → {{ item.departure.arrival_display_code }})
+                    </h5>
+                    <ul class="list-group list-group-flush mb-3">
+                        <li class="list-group-item">
+                            <strong>출발일:</strong> {{ item.departure.departure_date }} | {{item.departure.departure_time}} ~ {{item.departure.arrival_time}}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>복귀일:</strong> {{ item.return.departure_date }} | {{item.return.departure_time}} ~ {{item.return.arrival_time}}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>항공권 가격:</strong> {{ item.departure.amount|floatformat:0|intcomma }} + {{ item.return.price|floatformat:0|intcomma }} 원
+                        </li>
+                    </ul>
+
+                    <!-- 호텔 정보 -->
+                    <h5 class="card-title text-success mb-2">
+                        🏨 호텔 : {{ item.hotel.hotel_name }} ({{ item.hotel.city }})
+                    </h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <strong>체크인:</strong> {{ item.hotel.check_in }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>체크아웃:</strong> {{ item.hotel.check_out }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>숙박 가격:</strong> {{ item.hotel_price|floatformat:0|intcomma }} 원
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted">현재 조건에 맞는 조합이 없습니다.</p>
+    {% endif %}
+</div>
+{% endblock %}
