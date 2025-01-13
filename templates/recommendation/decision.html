@@ -276,12 +276,22 @@
             mode: 'range',
             dateFormat: 'Y-m-d',
             locale: 'ko',
-            onClose: function(selectedDates) {
+            onClose: function (selectedDates) {
                 if (selectedDates.length === 2) {
                     const start = selectedDates[0];
                     const end = selectedDates[1];
-                    $('#departure-date-start').val(start.toISOString().split("T")[0]);
-                    $('#departure-date-end').val(end.toISOString().split("T")[0]);
+
+                    // 로컬 날짜를 정확히 가져오기
+                    const startDate = start.getFullYear() + '-' +
+                            String(start.getMonth() + 1).padStart(2, '0') + '-' +
+                            String(start.getDate()).padStart(2, '0');
+
+                    const endDate = end.getFullYear() + '-' +
+                            String(end.getMonth() + 1).padStart(2, '0') + '-' +
+                            String(end.getDate()).padStart(2, '0');
+
+                    $('#departure-date-start').val(startDate);
+                    $('#departure-date-end').val(endDate);
                 } else {
                     $('#departure-date-start').val('');
                     $('#departure-date-end').val('');
@@ -294,18 +304,29 @@
             mode: 'range',
             dateFormat: 'Y-m-d',
             locale: 'ko',
-            onClose: function(selectedDates) {
+            onClose: function (selectedDates) {
                 if (selectedDates.length === 2) {
                     const start = selectedDates[0];
                     const end = selectedDates[1];
-                    $('#arrival-date-start').val(start.toISOString().split("T")[0]);
-                    $('#arrival-date-end').val(end.toISOString().split("T")[0]);
+
+                    // 로컬 날짜를 정확히 가져오기
+                    const startDate = start.getFullYear() + '-' +
+                            String(start.getMonth() + 1).padStart(2, '0') + '-' +
+                            String(start.getDate()).padStart(2, '0');
+
+                    const endDate = end.getFullYear() + '-' +
+                            String(end.getMonth() + 1).padStart(2, '0') + '-' +
+                            String(end.getDate()).padStart(2, '0');
+
+                    $('#arrival-date-start').val(startDate);
+                    $('#arrival-date-end').val(endDate);
                 } else {
                     $('#arrival-date-start').val('');
                     $('#arrival-date-end').val('');
                 }
             }
         });
+
 
         // 폼 제출
         $('#travel-form').on('submit', function(event) {

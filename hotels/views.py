@@ -104,7 +104,7 @@ def hotel_details(request):
             final_results.sort(key=lambda x: x['distance'])
 
         # 템플릿으로 전달
-        return render(request, 'hotels/details.html', {'hotels': final_results, 'sort_by': sort_by})
+        return render(request, 'hotels/details.html', {'hotels': final_results, 'sort_by': sort_by, 'checkin_date': checkin_date, 'checkout_date': checkout_date})
 
     except Exception as e:
         return render(request, 'hotels/details.html', {'error': str(e)})
